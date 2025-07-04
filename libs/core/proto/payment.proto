@@ -1,0 +1,263 @@
+syntax = "proto3";
+
+package fountane.payment;
+
+service PaymentService {
+  // Customer Management
+  rpc CreateCustomer(CreateCustomerRequest) returns (Customer);
+  rpc UpdateCustomer(UpdateCustomerRequest) returns (Customer);
+  rpc GetCustomer(GetCustomerRequest) returns (Customer);
+  rpc ListCustomers(ListCustomersRequest) returns (ListCustomersResponse);
+  
+  // Subscription Management
+  rpc CreateSubscription(CreateSubscriptionRequest) returns (Subscription);
+  rpc UpdateSubscription(UpdateSubscriptionRequest) returns (Subscription);
+  rpc CancelSubscription(CancelSubscriptionRequest) returns (Subscription);
+  rpc ReactivateSubscription(ReactivateSubscriptionRequest) returns (Subscription);
+  
+  // Usage Tracking
+  rpc RecordUsage(RecordUsageRequest) returns (Empty);
+  rpc GetUsage(GetUsageRequest) returns (GetUsageResponse);
+  
+  // Billing
+  rpc GenerateInvoice(GenerateInvoiceRequest) returns (Invoice);
+  rpc GetInvoice(GetInvoiceRequest) returns (Invoice);
+  rpc ListInvoices(ListInvoicesRequest) returns (ListInvoicesResponse);
+  
+  // Payment Methods
+  rpc AddPaymentMethod(AddPaymentMethodRequest) returns (PaymentMethod);
+  rpc RemovePaymentMethod(RemovePaymentMethodRequest) returns (Empty);
+  rpc SetDefaultPaymentMethod(SetDefaultPaymentMethodRequest) returns (Empty);
+  
+  // Webhooks
+  rpc HandleWebhook(HandleWebhookRequest) returns (HandleWebhookResponse);
+}
+
+// Customer Management Messages
+message CreateCustomerRequest {
+  string email = 1;
+  string name = 2;
+  string external_id = 3;
+  map<string, string> metadata = 4;
+  Address billing_address = 5;
+}
+
+message UpdateCustomerRequest {
+  string customer_id = 1;
+  string name = 2;
+  string email = 3;
+  map<string, string> metadata = 4;
+  Address billing_address = 5;
+}
+
+message GetCustomerRequest {
+  string customer_id = 1;
+}
+
+message ListCustomersRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+  string search = 3;
+}
+
+message ListCustomersResponse {
+  repeated Customer customers = 1;
+  int32 total = 2;
+}
+
+// Subscription Management Messages
+message CreateSubscriptionRequest {
+  string customer_id = 1;
+  string plan_id = 2;
+  string start_date = 3;
+  repeated SubscriptionItem items = 4;
+  map<string, string> metadata = 5;
+}
+
+message UpdateSubscriptionRequest {
+  string subscription_id = 1;
+  repeated SubscriptionItem items = 2;
+  map<string, string> metadata = 3;
+}
+
+message CancelSubscriptionRequest {
+  string subscription_id = 1;
+  string cancellation_reason = 2;
+  bool cancel_immediately = 3;
+}
+
+message ReactivateSubscriptionRequest {
+  string subscription_id = 1;
+}
+
+// Usage Tracking Messages
+message RecordUsageRequest {
+  string subscription_id = 1;
+  string metric_code = 2;
+  double quantity = 3;
+  string timestamp = 4;
+  map<string, string> properties = 5;
+}
+
+message GetUsageRequest {
+  string subscription_id = 1;
+  string metric_code = 2;
+  string from_date = 3;
+  string to_date = 4;
+}
+
+message GetUsageResponse {
+  repeated UsageRecord usage_records = 1;
+  double total_quantity = 2;
+}
+
+// Billing Messages
+message GenerateInvoiceRequest {
+  string subscription_id = 1;
+  string billing_period_start = 2;
+  string billing_period_end = 3;
+}
+
+message GetInvoiceRequest {
+  string invoice_id = 1;
+}
+
+message ListInvoicesRequest {
+  string customer_id = 1;
+  string subscription_id = 2;
+  string status = 3;
+  int32 limit = 4;
+  int32 offset = 5;
+}
+
+message ListInvoicesResponse {
+  repeated Invoice invoices = 1;
+  int32 total = 2;
+}
+
+// Payment Method Messages
+message AddPaymentMethodRequest {
+  string customer_id = 1;
+  string type = 2;
+  PaymentMethodDetails details = 3;
+  bool set_as_default = 4;
+}
+
+message RemovePaymentMethodRequest {
+  string payment_method_id = 1;
+}
+
+message SetDefaultPaymentMethodRequest {
+  string customer_id = 1;
+  string payment_method_id = 2;
+}
+
+// Webhook Messages
+message HandleWebhookRequest {
+  string provider = 1;
+  string event_type = 2;
+  bytes payload = 3;
+  map<string, string> headers = 4;
+}
+
+message HandleWebhookResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Data Models
+message Customer {
+  string id = 1;
+  string external_id = 2;
+  string email = 3;
+  string name = 4;
+  string currency = 5;
+  Address billing_address = 6;
+  map<string, string> metadata = 7;
+  string created_at = 8;
+  string updated_at = 9;
+}
+
+message Subscription {
+  string id = 1;
+  string customer_id = 2;
+  string status = 3;
+  string plan_id = 4;
+  repeated SubscriptionItem items = 5;
+  string start_date = 6;
+  string end_date = 7;
+  string canceled_at = 8;
+  map<string, string> metadata = 9;
+  string created_at = 10;
+  string updated_at = 11;
+}
+
+message SubscriptionItem {
+  string price_id = 1;
+  int32 quantity = 2;
+  map<string, string> properties = 3;
+}
+
+message Invoice {
+  string id = 1;
+  string customer_id = 2;
+  string subscription_id = 3;
+  string number = 4;
+  string status = 5;
+  double amount_due = 6;
+  double amount_paid = 7;
+  string currency = 8;
+  string issue_date = 9;
+  string due_date = 10;
+  repeated InvoiceItem items = 11;
+  string created_at = 12;
+  string updated_at = 13;
+}
+
+message InvoiceItem {
+  string description = 1;
+  double quantity = 2;
+  double unit_price = 3;
+  double amount = 4;
+  string currency = 5;
+}
+
+message PaymentMethod {
+  string id = 1;
+  string customer_id = 2;
+  string type = 3;
+  PaymentMethodDetails details = 4;
+  bool is_default = 5;
+  string created_at = 6;
+  string updated_at = 7;
+}
+
+message PaymentMethodDetails {
+  string brand = 1;
+  string last4 = 2;
+  string exp_month = 3;
+  string exp_year = 4;
+  map<string, string> additional_info = 5;
+}
+
+message UsageRecord {
+  string id = 1;
+  string subscription_id = 2;
+  string metric_code = 3;
+  double quantity = 4;
+  string timestamp = 5;
+  map<string, string> properties = 6;
+}
+
+message Address {
+  string line1 = 1;
+  string line2 = 2;
+  string city = 3;
+  string state = 4;
+  string postal_code = 5;
+  string country = 6;
+}
+
+message Empty {
+  string message = 1;
+}
