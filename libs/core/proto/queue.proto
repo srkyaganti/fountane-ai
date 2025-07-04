@@ -1,0 +1,246 @@
+syntax = "proto3";
+
+package queue;
+
+option go_package = "github.com/fountane/core/proto/queue";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service QueueService {
+  // Job Management
+  rpc CreateJob(CreateJobRequest) returns (Job);
+  rpc GetJob(GetJobRequest) returns (Job);
+  rpc CancelJob(CancelJobRequest) returns (google.protobuf.Empty);
+  rpc RetryJob(RetryJobRequest) returns (Job);
+  rpc ListJobs(ListJobsRequest) returns (ListJobsResponse);
+  
+  // Queue Management
+  rpc CreateQueue(CreateQueueRequest) returns (Queue);
+  rpc PauseQueue(PauseQueueRequest) returns (google.protobuf.Empty);
+  rpc ResumeQueue(ResumeQueueRequest) returns (google.protobuf.Empty);
+  rpc DrainQueue(DrainQueueRequest) returns (google.protobuf.Empty);
+  rpc GetQueueStats(GetQueueStatsRequest) returns (QueueStats);
+  
+  // Scheduled Jobs
+  rpc ScheduleJob(ScheduleJobRequest) returns (ScheduledJob);
+  rpc CancelScheduledJob(CancelScheduledJobRequest) returns (google.protobuf.Empty);
+  rpc ListScheduledJobs(ListScheduledJobsRequest) returns (ListScheduledJobsResponse);
+  
+  // Monitoring
+  rpc StreamJobEvents(StreamJobEventsRequest) returns (stream JobEvent);
+  rpc GetJobMetrics(GetJobMetricsRequest) returns (JobMetrics);
+}
+
+message Job {
+  string id = 1;
+  string queue_name = 2;
+  string type = 3;
+  bytes data = 4;
+  JobStatus status = 5;
+  int32 priority = 6;
+  int32 attempts = 7;
+  int32 max_attempts = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp started_at = 10;
+  google.protobuf.Timestamp completed_at = 11;
+  google.protobuf.Timestamp failed_at = 12;
+  string error_message = 13;
+  map<string, string> metadata = 14;
+  string tenant_id = 15;
+  repeated string depends_on = 16;
+  int32 progress = 17;
+  string result_url = 18;
+}
+
+enum JobStatus {
+  JOB_STATUS_UNSPECIFIED = 0;
+  JOB_STATUS_WAITING = 1;
+  JOB_STATUS_ACTIVE = 2;
+  JOB_STATUS_COMPLETED = 3;
+  JOB_STATUS_FAILED = 4;
+  JOB_STATUS_DELAYED = 5;
+  JOB_STATUS_CANCELLED = 6;
+}
+
+enum JobType {
+  JOB_TYPE_UNSPECIFIED = 0;
+  JOB_TYPE_EMAIL = 1;
+  JOB_TYPE_REPORT_GENERATION = 2;
+  JOB_TYPE_DATA_IMPORT = 3;
+  JOB_TYPE_DATA_EXPORT = 4;
+  JOB_TYPE_WEBHOOK_DELIVERY = 5;
+  JOB_TYPE_SCHEDULED_MAINTENANCE = 6;
+  JOB_TYPE_BATCH_PROCESSING = 7;
+  JOB_TYPE_VIDEO_PROCESSING = 8;
+  JOB_TYPE_IMAGE_PROCESSING = 9;
+  JOB_TYPE_THIRD_PARTY_SYNC = 10;
+}
+
+message CreateJobRequest {
+  string queue_name = 1;
+  string type = 2;
+  bytes data = 3;
+  int32 priority = 4;
+  int64 delay_ms = 5;
+  int32 max_attempts = 6;
+  map<string, string> metadata = 7;
+  string tenant_id = 8;
+  repeated string depends_on = 9;
+}
+
+message GetJobRequest {
+  string queue_name = 1;
+  string job_id = 2;
+}
+
+message CancelJobRequest {
+  string queue_name = 1;
+  string job_id = 2;
+}
+
+message RetryJobRequest {
+  string queue_name = 1;
+  string job_id = 2;
+}
+
+message ListJobsRequest {
+  string queue_name = 1;
+  repeated JobStatus statuses = 2;
+  int32 limit = 3;
+  int32 offset = 4;
+  string tenant_id = 5;
+}
+
+message ListJobsResponse {
+  repeated Job jobs = 1;
+  int32 total_count = 2;
+}
+
+message Queue {
+  string name = 1;
+  bool is_paused = 2;
+  google.protobuf.Timestamp created_at = 3;
+  map<string, string> config = 4;
+}
+
+message CreateQueueRequest {
+  string name = 1;
+  map<string, string> config = 2;
+}
+
+message PauseQueueRequest {
+  string queue_name = 1;
+}
+
+message ResumeQueueRequest {
+  string queue_name = 1;
+}
+
+message DrainQueueRequest {
+  string queue_name = 1;
+  bool wait_for_active = 2;
+}
+
+message GetQueueStatsRequest {
+  string queue_name = 1;
+}
+
+message QueueStats {
+  string queue_name = 1;
+  int64 waiting_count = 2;
+  int64 active_count = 3;
+  int64 completed_count = 4;
+  int64 failed_count = 5;
+  int64 delayed_count = 6;
+  double jobs_per_minute = 7;
+  double average_processing_time_ms = 8;
+}
+
+message ScheduledJob {
+  string id = 1;
+  string queue_name = 2;
+  string type = 3;
+  bytes data = 4;
+  string cron_expression = 5;
+  string timezone = 6;
+  google.protobuf.Timestamp next_run_at = 7;
+  google.protobuf.Timestamp last_run_at = 8;
+  bool is_active = 9;
+  map<string, string> metadata = 10;
+  string tenant_id = 11;
+}
+
+message ScheduleJobRequest {
+  string queue_name = 1;
+  string type = 2;
+  bytes data = 3;
+  string cron_expression = 4;
+  string timezone = 5;
+  map<string, string> metadata = 6;
+  string tenant_id = 7;
+}
+
+message CancelScheduledJobRequest {
+  string scheduled_job_id = 1;
+}
+
+message ListScheduledJobsRequest {
+  string queue_name = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+  string tenant_id = 4;
+}
+
+message ListScheduledJobsResponse {
+  repeated ScheduledJob scheduled_jobs = 1;
+  int32 total_count = 2;
+}
+
+message StreamJobEventsRequest {
+  string queue_name = 1;
+  repeated JobEventType event_types = 2;
+  string tenant_id = 3;
+}
+
+enum JobEventType {
+  JOB_EVENT_TYPE_UNSPECIFIED = 0;
+  JOB_EVENT_TYPE_CREATED = 1;
+  JOB_EVENT_TYPE_STARTED = 2;
+  JOB_EVENT_TYPE_PROGRESS = 3;
+  JOB_EVENT_TYPE_COMPLETED = 4;
+  JOB_EVENT_TYPE_FAILED = 5;
+  JOB_EVENT_TYPE_RETRIED = 6;
+  JOB_EVENT_TYPE_CANCELLED = 7;
+}
+
+message JobEvent {
+  string job_id = 1;
+  string queue_name = 2;
+  JobEventType event_type = 3;
+  google.protobuf.Timestamp timestamp = 4;
+  map<string, string> data = 5;
+}
+
+message GetJobMetricsRequest {
+  string queue_name = 1;
+  google.protobuf.Timestamp start_time = 2;
+  google.protobuf.Timestamp end_time = 3;
+  string tenant_id = 4;
+}
+
+message JobMetrics {
+  int64 total_jobs = 1;
+  int64 completed_jobs = 2;
+  int64 failed_jobs = 3;
+  double success_rate = 4;
+  double average_processing_time_ms = 5;
+  map<string, int64> jobs_by_type = 6;
+  repeated HourlyMetric hourly_metrics = 7;
+}
+
+message HourlyMetric {
+  google.protobuf.Timestamp hour = 1;
+  int64 job_count = 2;
+  double average_processing_time_ms = 3;
+}

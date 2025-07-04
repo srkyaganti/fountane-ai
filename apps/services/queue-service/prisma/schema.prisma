@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Job {
+  id          String   @id @default(uuid())
+  queueName   String   @map("queue_name")
+  type        String
+  data        Json
+  status      String
+  priority    Int      @default(0)
+  attempts    Int      @default(0)
+  maxAttempts Int      @default(3) @map("max_attempts")
+  tenantId    String   @map("tenant_id")
+  metadata    Json?
+  resultUrl   String?  @map("result_url")
+  errorMessage String? @map("error_message")
+  dependsOn   String[] @map("depends_on")
+  createdAt   DateTime @default(now()) @map("created_at")
+  startedAt   DateTime? @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  failedAt    DateTime? @map("failed_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  @@index([queueName, status])
+  @@index([tenantId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("jobs")
+}
+
+model ScheduledJob {
+  id             String   @id @default(uuid())
+  queueName      String   @map("queue_name")
+  type           String
+  data           Json
+  cronExpression String   @map("cron_expression")
+  timezone       String   @default("UTC")
+  isActive       Boolean  @default(true) @map("is_active")
+  tenantId       String   @map("tenant_id")
+  metadata       Json?
+  nextRunAt      DateTime @map("next_run_at")
+  lastRunAt      DateTime? @map("last_run_at")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
+
+  @@index([queueName, isActive])
+  @@index([tenantId])
+  @@index([nextRunAt])
+  @@map("scheduled_jobs")
+}
+
+model Queue {
+  name      String   @id
+  isPaused  Boolean  @default(false) @map("is_paused")
+  config    Json?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("queues")
+}
+
+model JobEvent {
+  id        String   @id @default(uuid())
+  jobId     String   @map("job_id")
+  queueName String   @map("queue_name")
+  eventType String   @map("event_type")
+  data      Json?
+  tenantId  String?  @map("tenant_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([jobId])
+  @@index([queueName, eventType])
+  @@index([tenantId])
+  @@index([createdAt])
+  @@map("job_events")
+}
+
+model JobMetric {
+  id                   String   @id @default(uuid())
+  queueName            String   @map("queue_name")
+  hour                 DateTime
+  jobCount             Int      @map("job_count")
+  completedCount       Int      @map("completed_count")
+  failedCount          Int      @map("failed_count")
+  totalProcessingTime  Float    @map("total_processing_time")
+  jobsByType           Json     @map("jobs_by_type")
+  tenantId             String?  @map("tenant_id")
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  @@unique([queueName, hour, tenantId])
+  @@index([queueName, hour])
+  @@index([tenantId])
+  @@map("job_metrics")
+}

@@ -1,0 +1,39 @@
+{
+  "name": "@fountane/queue-service",
+  "version": "0.0.1",
+  "description": "Queue service for Fountane AI platform",
+  "author": "",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "nx build queue-service",
+    "serve": "nx serve queue-service",
+    "test": "nx test queue-service",
+    "lint": "nx lint queue-service"
+  },
+  "dependencies": {
+    "@nestjs/bullmq": "^10.4.1",
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/platform-express": "^11.0.0",
+    "@nestjs/microservices": "^11.1.3",
+    "@nestjs/schedule": "^6.0.0",
+    "@nestjs/terminus": "^11.0.0",
+    "@bull-board/nestjs": "^6.11.0",
+    "@bull-board/express": "^6.11.0",
+    "@bull-board/api": "^6.11.0",
+    "bullmq": "^5.31.5",
+    "@grpc/grpc-js": "^1.13.4",
+    "@grpc/proto-loader": "^0.7.15",
+    "@prisma/client": "^6.11.1",
+    "prisma": "^6.11.1",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.0"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "^11.0.0",
+    "@types/node": "18.16.9",
+    "typescript": "~5.8.2"
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "name": "queue-service",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/services/queue-service/src",
+  "projectType": "application",
+  "tags": ["service", "backend"],
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/services/queue-service",
+        "main": "apps/services/queue-service/src/main.ts",
+        "tsConfig": "apps/services/queue-service/tsconfig.app.json",
+        "assets": ["apps/services/queue-service/src/assets"],
+        "isolatedConfig": true,
+        "webpackConfig": "apps/services/queue-service/webpack.config.js"
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "queue-service:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "queue-service:build:development"
+        },
+        "production": {
+          "buildTarget": "queue-service:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/services/queue-service/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/services/queue-service/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    },
+    "docker-build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "docker build -f apps/services/queue-service/Dockerfile -t fountane/queue-service:latest ."
+        ],
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "prisma-generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "prisma generate",
+        "cwd": "apps/services/queue-service"
+      }
+    },
+    "prisma-migrate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "prisma migrate dev",
+        "cwd": "apps/services/queue-service"
+      }
+    }
+  }
+}
