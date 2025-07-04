@@ -329,6 +329,43 @@ services:
       retries: 3
       start_period: 40s
 
+  # Gateway Service
+  gateway-service:
+    build:
+      context: .
+      dockerfile: apps/services/gateway-service/Dockerfile
+    container_name: fountane-gateway-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: info
+      PORT: 3000
+      GLOBAL_PREFIX: api
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      AUTH_SERVICE_URL: auth-service:50051
+      CORS_ORIGIN: '*'
+    ports:
+      - '3000:3000'
+    depends_on:
+      auth-service:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:3000/api/health', (res) => res.statusCode === 200 ? process.exit(0) : process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.gateway.rule=PathPrefix(`/api`)'
+      - 'traefik.http.services.gateway.loadbalancer.server.port=3000'
+
 volumes:
   postgres_data:
   redis_data:

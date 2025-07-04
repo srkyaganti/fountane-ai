@@ -35,6 +35,12 @@
     },
     {
       "path": "./apps/services/realtime-service"
+    },
+    {
+      "path": "./apps/services/gateway-service-e2e"
+    },
+    {
+      "path": "./apps/services/gateway-service"
     }
   ]
 }
