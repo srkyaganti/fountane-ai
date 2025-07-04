@@ -157,6 +157,8 @@ importers:
 
   apps/services/realtime-service-e2e: {}
 
+  apps/services/payment-service: {}
+
   libs/core/config:
     dependencies:
       dotenv:
