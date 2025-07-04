@@ -1,0 +1,216 @@
+version: '3.9'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: fountane-postgres
+    environment:
+      POSTGRES_USER: fountane
+      POSTGRES_PASSWORD: fountane_dev_password
+      POSTGRES_DB: fountane_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fountane"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching and queues
+  redis:
+    image: redis:7-alpine
+    container_name: fountane-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --requirepass fountane_redis_dev
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Keycloak for authentication
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0
+    container_name: fountane-keycloak
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: fountane
+      KC_DB_PASSWORD: fountane_dev_password
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8080
+      KC_HOSTNAME_STRICT: false
+      KC_HTTP_ENABLED: true
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HEALTH_ENABLED: true
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin_dev_password
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: start-dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
+      interval: 30s
+      timeout: 3s
+      retries: 5
+
+  # MinIO for object storage
+  minio:
+    image: minio/minio:latest
+    container_name: fountane-minio
+    environment:
+      MINIO_ROOT_USER: fountane_minio
+      MINIO_ROOT_PASSWORD: fountane_minio_dev
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # n8n for workflow automation
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: fountane-n8n
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=admin_dev_password
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=fountane
+      - DB_POSTGRESDB_PASSWORD=fountane_dev_password
+      - N8N_ENCRYPTION_KEY=fountane_n8n_encryption_key_dev
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5678/healthz || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Centrifugo for real-time messaging
+  centrifugo:
+    image: centrifugo/centrifugo:v5
+    container_name: fountane-centrifugo
+    volumes:
+      - ./infrastructure/centrifugo/config.json:/centrifugo/config.json
+    ports:
+      - "8000:8000"
+    command: centrifugo -c config.json
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Unleash for feature flags
+  unleash:
+    image: unleashorg/unleash-server:latest
+    container_name: fountane-unleash
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_NAME: unleash
+      DATABASE_USERNAME: fountane
+      DATABASE_PASSWORD: fountane_dev_password
+      DATABASE_SSL: false
+      INIT_CLIENT_API_TOKENS: "default:development.unleash-insecure-api-token"
+    ports:
+      - "4242:4242"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4242/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Lago for payments/billing
+  lago-api:
+    image: getlago/api:latest
+    container_name: fountane-lago-api
+    environment:
+      DATABASE_URL: postgresql://fountane:fountane_dev_password@postgres:5432/lago
+      REDIS_URL: redis://:fountane_redis_dev@redis:6379
+      LAGO_API_URL: http://localhost:3000
+      LAGO_FRONT_URL: http://localhost:3001
+      SECRET_KEY_BASE: fountane_lago_secret_key_base_development
+      RAILS_ENV: development
+      ENCRYPTION_PRIMARY_KEY: fountane_lago_encryption_primary_key_32c
+      ENCRYPTION_DETERMINISTIC_KEY: fountane_lago_encryption_det_key_32chars
+      ENCRYPTION_KEY_DERIVATION_SALT: fountane_lago_key_derivation_salt_32c
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  lago-front:
+    image: getlago/front:latest
+    container_name: fountane-lago-front
+    environment:
+      API_URL: http://localhost:3000
+      LAGO_DISABLE_SIGNUP: "false"
+    ports:
+      - "3001:80"
+    depends_on:
+      lago-api:
+        condition: service_healthy
+
+  # Traefik as reverse proxy
+  traefik:
+    image: traefik:v3.0
+    container_name: fountane-traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8090:8080"  # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+  n8n_data:
+
+networks:
+  default:
+    name: fountane-network
