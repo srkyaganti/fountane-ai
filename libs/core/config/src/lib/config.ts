@@ -21,14 +21,11 @@ export class ConfigService {
   private readonly cache = new Map<string, any>();
   private readonly validationSchema?: Joi.ObjectSchema;
 
-  constructor(
-    schema?: ValidationSchema,
-    options: ConfigOptions = {},
-  ) {
+  constructor(schema?: ValidationSchema, options: ConfigOptions = {}) {
     const {
       envFilePath = '.env',
       ignoreEnvFile = false,
-      expandVariables = true,
+      // expandVariables = true,
       cache = true,
       load = [],
     } = options;
@@ -65,9 +62,7 @@ export class ConfigService {
       });
 
       if (error) {
-        throw new Error(
-          `Configuration validation error: ${error.message}`,
-        );
+        throw new Error(`Configuration validation error: ${error.message}`);
       }
 
       // Use validated values (with defaults applied)
@@ -78,7 +73,7 @@ export class ConfigService {
     this.cache.clear();
     if (!cache) {
       this.cache.clear = () => undefined;
-      this.cache.set = () => undefined;
+      this.cache.set = () => new Map();
       this.cache.get = () => undefined;
     }
   }
@@ -234,7 +229,7 @@ export class ConfigService {
 
       // Comma-separated array
       if (value.includes(',')) {
-        return value.split(',').map(s => s.trim()) as T;
+        return value.split(',').map((s) => s.trim()) as T;
       }
     }
 
@@ -251,16 +246,15 @@ export const CommonSchemas = {
   nodeEnv: Joi.string()
     .valid('development', 'test', 'production', 'staging')
     .default('development'),
-  logLevel: Joi.string()
-    .valid('trace', 'debug', 'info', 'warn', 'error', 'fatal')
-    .default('info'),
-  databaseUrl: Joi.string().uri({ scheme: ['postgres', 'postgresql'] }).required(),
-  redisUrl: Joi.string().uri({ scheme: ['redis', 'rediss'] }).required(),
+  logLevel: Joi.string().valid('trace', 'debug', 'info', 'warn', 'error', 'fatal').default('info'),
+  databaseUrl: Joi.string()
+    .uri({ scheme: ['postgres', 'postgresql'] })
+    .required(),
+  redisUrl: Joi.string()
+    .uri({ scheme: ['redis', 'rediss'] })
+    .required(),
   jwtSecret: Joi.string().min(32).required(),
-  corsOrigins: Joi.alternatives().try(
-    Joi.string(),
-    Joi.array().items(Joi.string()),
-  ),
+  corsOrigins: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string())),
   boolean: Joi.boolean(),
   required: Joi.required(),
 };
@@ -299,10 +293,7 @@ export class EnvironmentConfigLoader {
 /**
  * Configuration factory
  */
-export function createConfig(
-  schema?: ValidationSchema,
-  options?: ConfigOptions,
-): ConfigService {
+export function createConfig(schema?: ValidationSchema, options?: ConfigOptions): ConfigService {
   return new ConfigService(schema, options);
 }
 

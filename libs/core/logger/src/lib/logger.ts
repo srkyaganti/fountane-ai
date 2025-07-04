@@ -29,8 +29,8 @@ class Logger {
       formatters: {
         level: (label: string) => ({ level: label }),
         bindings: (bindings) => ({
-          pid: bindings.pid,
-          hostname: bindings.hostname,
+          pid: bindings['pid'],
+          hostname: bindings['hostname'],
           service: config.service,
           environment: config.environment ?? 'development',
         }),
@@ -97,7 +97,10 @@ class Logger {
     return childLogger;
   }
 
-  private formatMessage(message: string, meta?: Record<string, unknown>): [string, Record<string, unknown>] {
+  private formatMessage(
+    message: string,
+    meta?: Record<string, unknown>,
+  ): [string, Record<string, unknown>] {
     const correlationId = this.context.correlationId ?? randomUUID();
     const logMeta = {
       ...this.context,
@@ -146,11 +149,13 @@ class Logger {
 
   // Performance logging
   time(label: string): void {
-    this.pino.time(label);
+    // Note: time/timeEnd methods are not available in current pino version
+    this.debug(`Timer started: ${label}`);
   }
 
   timeEnd(label: string, meta?: Record<string, unknown>): void {
-    this.pino.timeEnd(label, meta);
+    // Note: time/timeEnd methods are not available in current pino version
+    this.debug(`Timer ended: ${label}`, meta);
   }
 
   // Audit logging
@@ -180,13 +185,16 @@ class Logger {
   logRequest(req: any, res: any, responseTime: number): void {
     const statusCode = res.statusCode;
     const level = statusCode >= 500 ? 'error' : statusCode >= 400 ? 'warn' : 'info';
-    
-    this.pino[level]({
-      request: req,
-      response: res,
-      responseTime,
-      type: 'http',
-    }, `${req.method} ${req.url} ${statusCode} ${responseTime}ms`);
+
+    this.pino[level](
+      {
+        request: req,
+        response: res,
+        responseTime,
+        type: 'http',
+      },
+      `${req.method} ${req.url} ${statusCode} ${responseTime}ms`,
+    );
   }
 
   // Flush logs (useful for Lambda/serverless)

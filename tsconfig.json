@@ -25,12 +25,6 @@
       "path": "./apps/services/feature-service"
     },
     {
-      "path": "./apps/services/auth-service"
-    },
-    {
-      "path": "./apps/services/auth-service-e2e"
-    },
-    {
       "path": "./apps/services/realtime-service-e2e"
     },
     {
@@ -41,6 +35,15 @@
     },
     {
       "path": "./apps/services/gateway-service"
+    },
+    {
+      "path": "./apps/services/workflow-service"
+    },
+    {
+      "path": "./apps/services/payment-service"
+    },
+    {
+      "path": "./apps/services/queue-service"
     }
   ]
 }

@@ -8,6 +8,6 @@
     "types": ["node"]
   },
   "files": [],
-  "include": ["generated/**/*"],
+  "include": ["generated/**/*", "src/**/*"],
   "exclude": ["node_modules"]
 }

@@ -1,0 +1,25 @@
+{
+  "name": "@fountane/core/proto",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/core/proto/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/core/proto",
+        "main": "libs/core/proto/src/index.ts",
+        "tsConfig": "libs/core/proto/tsconfig.lib.json",
+        "assets": ["libs/core/proto/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/core/proto/**/*.ts"]
+      }
+    }
+  }
+}
