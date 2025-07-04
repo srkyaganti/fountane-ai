@@ -243,6 +243,46 @@ services:
       retries: 3
       start_period: 40s
 
+  # Feature Service
+  feature-service:
+    build:
+      context: .
+      dockerfile: apps/services/feature-service/Dockerfile
+    container_name: fountane-feature-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: info
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: fountane_redis_dev
+      UNLEASH_URL: http://unleash:4242/api
+      UNLEASH_APP_NAME: fountane-feature-service
+      UNLEASH_INSTANCE_ID: fountane-feature-service-instance
+      UNLEASH_API_TOKEN: 'default:development.unleash-insecure-api-token'
+      UNLEASH_ENVIRONMENT: development
+      UNLEASH_REFRESH_INTERVAL: 15000
+      UNLEASH_METRICS_INTERVAL: 60000
+    ports:
+      - '50053:50053'
+    depends_on:
+      unleash:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('net').createConnection({port: 50053}, () => process.exit(0)).on('error', () => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+
   # Realtime Service
   realtime-service:
     build:

@@ -1,0 +1,251 @@
+syntax = "proto3";
+
+package fountane.feature;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service FeatureService {
+  // Feature Flag Management
+  rpc CreateFeature(CreateFeatureRequest) returns (Feature);
+  rpc UpdateFeature(UpdateFeatureRequest) returns (Feature);
+  rpc DeleteFeature(DeleteFeatureRequest) returns (google.protobuf.Empty);
+  rpc GetFeature(GetFeatureRequest) returns (Feature);
+  rpc ListFeatures(ListFeaturesRequest) returns (ListFeaturesResponse);
+  
+  // Feature Evaluation
+  rpc IsEnabled(IsEnabledRequest) returns (IsEnabledResponse);
+  rpc GetVariant(GetVariantRequest) returns (GetVariantResponse);
+  rpc EvaluateFeatures(EvaluateFeaturesRequest) returns (EvaluateFeaturesResponse);
+  
+  // Targeting Rules
+  rpc AddTargetingRule(AddTargetingRuleRequest) returns (TargetingRule);
+  rpc RemoveTargetingRule(RemoveTargetingRuleRequest) returns (google.protobuf.Empty);
+  rpc UpdateTargetingRule(UpdateTargetingRuleRequest) returns (TargetingRule);
+  
+  // Metrics & Analytics
+  rpc RecordImpression(RecordImpressionRequest) returns (google.protobuf.Empty);
+  rpc GetFeatureMetrics(GetFeatureMetricsRequest) returns (FeatureMetrics);
+  
+  // Environment Management
+  rpc CreateEnvironment(CreateEnvironmentRequest) returns (Environment);
+  rpc CopyEnvironment(CopyEnvironmentRequest) returns (Environment);
+}
+
+// Core Data Structures
+message Feature {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  FeatureType type = 4;
+  bool enabled = 5;
+  repeated string tags = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+  string project_id = 9;
+  map<string, FeatureEnvironment> environments = 10;
+  repeated Variant variants = 11;
+}
+
+enum FeatureType {
+  BOOLEAN = 0;
+  PERCENTAGE = 1;
+  VARIANT = 2;
+  GRADUAL_ROLLOUT = 3;
+}
+
+message FeatureEnvironment {
+  string environment = 1;
+  bool enabled = 2;
+  repeated TargetingRule rules = 3;
+  map<string, string> parameters = 4;
+}
+
+message Variant {
+  string name = 1;
+  int32 weight = 2;
+  map<string, string> payload = 3;
+  repeated Override overrides = 4;
+}
+
+message Override {
+  string context_field = 1;
+  repeated string values = 2;
+}
+
+message TargetingRule {
+  string id = 1;
+  TargetingRuleType type = 2;
+  map<string, string> parameters = 3;
+  repeated Constraint constraints = 4;
+  repeated string segments = 5;
+}
+
+enum TargetingRuleType {
+  USER_ID = 0;
+  GROUP_ID = 1;
+  PERCENTAGE = 2;
+  TIME_BASED = 3;
+  CUSTOM_ATTRIBUTE = 4;
+}
+
+message Constraint {
+  string field = 1;
+  Operator operator = 2;
+  repeated string values = 3;
+}
+
+enum Operator {
+  IN = 0;
+  NOT_IN = 1;
+  EQUALS = 2;
+  NOT_EQUALS = 3;
+  GREATER_THAN = 4;
+  LESS_THAN = 5;
+  CONTAINS = 6;
+  NOT_CONTAINS = 7;
+}
+
+message Environment {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  int32 sort_order = 4;
+  google.protobuf.Timestamp created_at = 5;
+}
+
+message EvaluationContext {
+  string user_id = 1;
+  string session_id = 2;
+  string tenant_id = 3;
+  map<string, string> properties = 4;
+  string environment = 5;
+}
+
+message FeatureMetrics {
+  string feature_id = 1;
+  int64 total_impressions = 2;
+  int64 enabled_count = 3;
+  int64 disabled_count = 4;
+  map<string, int64> variant_counts = 5;
+  google.protobuf.Timestamp from = 6;
+  google.protobuf.Timestamp to = 7;
+}
+
+// Request/Response Messages
+message CreateFeatureRequest {
+  string name = 1;
+  string description = 2;
+  FeatureType type = 3;
+  repeated string tags = 4;
+  string project_id = 5;
+  repeated Variant variants = 6;
+}
+
+message UpdateFeatureRequest {
+  string id = 1;
+  string description = 2;
+  repeated string tags = 3;
+  repeated Variant variants = 4;
+}
+
+message DeleteFeatureRequest {
+  string id = 1;
+}
+
+message GetFeatureRequest {
+  string id = 1;
+}
+
+message ListFeaturesRequest {
+  string project_id = 1;
+  repeated string tags = 2;
+  int32 page_size = 3;
+  string page_token = 4;
+}
+
+message ListFeaturesResponse {
+  repeated Feature features = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+message IsEnabledRequest {
+  string feature_name = 1;
+  EvaluationContext context = 2;
+}
+
+message IsEnabledResponse {
+  bool enabled = 1;
+  string reason = 2;
+}
+
+message GetVariantRequest {
+  string feature_name = 1;
+  EvaluationContext context = 2;
+}
+
+message GetVariantResponse {
+  string variant_name = 1;
+  map<string, string> payload = 2;
+  bool enabled = 3;
+}
+
+message EvaluateFeaturesRequest {
+  repeated string feature_names = 1;
+  EvaluationContext context = 2;
+}
+
+message EvaluateFeaturesResponse {
+  map<string, FeatureEvaluation> evaluations = 1;
+}
+
+message FeatureEvaluation {
+  bool enabled = 1;
+  string variant = 2;
+  map<string, string> payload = 3;
+  string reason = 4;
+}
+
+message AddTargetingRuleRequest {
+  string feature_id = 1;
+  string environment = 2;
+  TargetingRule rule = 3;
+}
+
+message RemoveTargetingRuleRequest {
+  string feature_id = 1;
+  string environment = 2;
+  string rule_id = 3;
+}
+
+message UpdateTargetingRuleRequest {
+  string feature_id = 1;
+  string environment = 2;
+  TargetingRule rule = 3;
+}
+
+message RecordImpressionRequest {
+  string feature_name = 1;
+  EvaluationContext context = 2;
+  bool enabled = 3;
+  string variant = 4;
+}
+
+message GetFeatureMetricsRequest {
+  string feature_id = 1;
+  google.protobuf.Timestamp from = 2;
+  google.protobuf.Timestamp to = 3;
+}
+
+message CreateEnvironmentRequest {
+  string name = 1;
+  string description = 2;
+  int32 sort_order = 3;
+}
+
+message CopyEnvironmentRequest {
+  string source_environment_id = 1;
+  string target_name = 2;
+  string target_description = 3;
+}

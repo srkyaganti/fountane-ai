@@ -1,0 +1,53 @@
+{
+  "name": "@./feature-service",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "postinstall": "echo 'Feature service installed'"
+  },
+  "nx": {
+    "name": "feature-service",
+    "targets": {
+      "build": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "webpack-cli build",
+          "args": [
+            "--node-env=production"
+          ]
+        },
+        "configurations": {
+          "development": {
+            "args": [
+              "--node-env=development"
+            ]
+          }
+        }
+      },
+      "serve": {
+        "continuous": true,
+        "executor": "@nx/js:node",
+        "defaultConfiguration": "development",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "buildTarget": "feature-service:build",
+          "runBuildTargetDependencies": false
+        },
+        "configurations": {
+          "development": {
+            "buildTarget": "feature-service:build:development"
+          },
+          "production": {
+            "buildTarget": "feature-service:build:production"
+          }
+        }
+      }
+    },
+    "tags": [
+      "scope:backend",
+      "type:service"
+    ]
+  }
+}
