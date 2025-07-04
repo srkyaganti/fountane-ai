@@ -26,6 +26,12 @@
     },
     {
       "path": "./apps/services/auth-service-e2e"
+    },
+    {
+      "path": "./apps/services/realtime-service-e2e"
+    },
+    {
+      "path": "./apps/services/realtime-service"
     }
   ]
 }
