@@ -1,0 +1,199 @@
+syntax = "proto3";
+
+package fountane.realtime;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+// RealtimeService provides real-time bidirectional communication capabilities
+service RealtimeService {
+  // Channel Management
+  rpc CreateChannel(CreateChannelRequest) returns (Channel);
+  rpc DeleteChannel(DeleteChannelRequest) returns (google.protobuf.Empty);
+  rpc ListChannels(ListChannelsRequest) returns (ListChannelsResponse);
+  
+  // Publishing
+  rpc Publish(PublishRequest) returns (PublishResponse);
+  rpc PublishBatch(PublishBatchRequest) returns (PublishBatchResponse);
+  
+  // Presence
+  rpc GetPresence(GetPresenceRequest) returns (GetPresenceResponse);
+  rpc GetPresenceStats(GetPresenceStatsRequest) returns (GetPresenceStatsResponse);
+  
+  // History
+  rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse);
+  rpc RemoveHistory(RemoveHistoryRequest) returns (google.protobuf.Empty);
+  
+  // Connection Management
+  rpc DisconnectUser(DisconnectUserRequest) returns (google.protobuf.Empty);
+  rpc RefreshConnection(RefreshConnectionRequest) returns (google.protobuf.Empty);
+  
+  // Subscription Management
+  rpc Subscribe(SubscribeRequest) returns (SubscribeResponse);
+  rpc Unsubscribe(UnsubscribeRequest) returns (google.protobuf.Empty);
+}
+
+// Channel types
+enum ChannelType {
+  CHANNEL_TYPE_UNSPECIFIED = 0;
+  CHANNEL_TYPE_USER = 1;        // 1:1 user notifications
+  CHANNEL_TYPE_TEAM = 2;        // many:many team channels
+  CHANNEL_TYPE_SYSTEM = 3;      // 1:many system broadcasts
+  CHANNEL_TYPE_PRESENCE = 4;    // Presence tracking channels
+  CHANNEL_TYPE_PRIVATE = 5;     // Private invite-only channels
+}
+
+// Channel model
+message Channel {
+  string id = 1;
+  string name = 2;
+  ChannelType type = 3;
+  string tenant_id = 4;
+  map<string, string> metadata = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+  ChannelSettings settings = 8;
+}
+
+// Channel settings
+message ChannelSettings {
+  bool history_enabled = 1;
+  int32 history_ttl_seconds = 2;
+  bool presence_enabled = 3;
+  bool push_notifications_enabled = 4;
+  int32 max_subscribers = 5;
+}
+
+// Message model
+message Message {
+  string id = 1;
+  string channel_id = 2;
+  string user_id = 3;
+  string content = 4;
+  map<string, string> metadata = 5;
+  google.protobuf.Timestamp timestamp = 6;
+}
+
+// Presence info
+message PresenceInfo {
+  string user_id = 1;
+  string client_id = 2;
+  map<string, string> metadata = 3;
+  google.protobuf.Timestamp joined_at = 4;
+}
+
+// Request/Response messages
+
+// Channel Management
+message CreateChannelRequest {
+  string name = 1;
+  ChannelType type = 2;
+  string tenant_id = 3;
+  map<string, string> metadata = 4;
+  ChannelSettings settings = 5;
+}
+
+message DeleteChannelRequest {
+  string channel_id = 1;
+}
+
+message ListChannelsRequest {
+  string tenant_id = 1;
+  ChannelType type = 2;
+  int32 page_size = 3;
+  string page_token = 4;
+}
+
+message ListChannelsResponse {
+  repeated Channel channels = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+// Publishing
+message PublishRequest {
+  string channel_id = 1;
+  string content = 2;
+  map<string, string> metadata = 3;
+  string user_id = 4;
+}
+
+message PublishResponse {
+  string message_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+}
+
+message PublishBatchRequest {
+  repeated PublishRequest messages = 1;
+}
+
+message PublishBatchResponse {
+  repeated PublishResponse results = 1;
+}
+
+// Presence
+message GetPresenceRequest {
+  string channel_id = 1;
+}
+
+message GetPresenceResponse {
+  repeated PresenceInfo users = 1;
+}
+
+message GetPresenceStatsRequest {
+  string channel_id = 1;
+}
+
+message GetPresenceStatsResponse {
+  int32 total_users = 1;
+  int32 total_clients = 2;
+  google.protobuf.Timestamp last_activity = 3;
+}
+
+// History
+message GetHistoryRequest {
+  string channel_id = 1;
+  int32 limit = 2;
+  google.protobuf.Timestamp since = 3;
+  google.protobuf.Timestamp until = 4;
+  bool reverse = 5;
+}
+
+message GetHistoryResponse {
+  repeated Message messages = 1;
+  bool has_more = 2;
+}
+
+message RemoveHistoryRequest {
+  string channel_id = 1;
+  google.protobuf.Timestamp until = 2;
+}
+
+// Connection Management
+message DisconnectUserRequest {
+  string user_id = 1;
+  string reason = 2;
+}
+
+message RefreshConnectionRequest {
+  string user_id = 1;
+  string token = 2;
+}
+
+// Subscription Management
+message SubscribeRequest {
+  string user_id = 1;
+  string channel_id = 2;
+  map<string, string> metadata = 3;
+}
+
+message SubscribeResponse {
+  bool success = 1;
+  string subscription_id = 2;
+  string error = 3;
+}
+
+message UnsubscribeRequest {
+  string user_id = 1;
+  string channel_id = 2;
+}

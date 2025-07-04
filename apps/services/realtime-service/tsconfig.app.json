@@ -1,5 +1,5 @@
 {
-  "extends": "../../../../../tsconfig.base.json",
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
     "types": ["node"],
@@ -15,10 +15,5 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": [],
-  "references": [
-    {
-      "path": "../../../libs/core/proto"
-    }
-  ]
+  "exclude": []
 }

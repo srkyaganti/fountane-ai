@@ -243,6 +243,52 @@ services:
       retries: 3
       start_period: 40s
 
+  # Realtime Service
+  realtime-service:
+    build:
+      context: .
+      dockerfile: apps/services/realtime-service/Dockerfile
+    container_name: fountane-realtime-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: info
+      CENTRIFUGO_URL: http://centrifugo:8000
+      CENTRIFUGO_API_KEY: fountane-api-key-dev
+      CENTRIFUGO_SECRET: fountane-centrifugo-secret-dev
+      CENTRIFUGO_TOKEN_HMAC_SECRET_KEY: fountane-centrifugo-token-secret-dev
+      JWT_SECRET: fountane-jwt-secret
+      JWT_EXPIRES_IN: 24h
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: fountane_redis_dev
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: fountane
+      POSTGRES_PASSWORD: fountane_dev_password
+      POSTGRES_DATABASE: fountane_realtime
+    ports:
+      - '50054:50054'
+    depends_on:
+      centrifugo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('net').createConnection({port: 50054}, () => process.exit(0)).on('error', () => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+
 volumes:
   postgres_data:
   redis_data:
