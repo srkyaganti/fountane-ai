@@ -1,5 +1,5 @@
 {
-  "extends": "../../../../../tsconfig.base.json",
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
     "types": ["node"],
@@ -8,6 +8,9 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "es2021",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "emitDeclarationOnly": false,
     "strictNullChecks": true,
     "noImplicitAny": true,
     "strictBindCallApply": true,
@@ -18,7 +21,7 @@
   "exclude": [],
   "references": [
     {
-      "path": "../../../libs/core/proto"
+      "path": "../../../libs/core/proto/tsconfig.lib.json"
     }
   ]
 }
