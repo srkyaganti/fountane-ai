@@ -136,6 +136,122 @@ importers:
 
   apps/services/auth-service-e2e: {}
 
+  apps/services/gateway-service:
+    dependencies:
+      '@nestjs/jwt':
+        specifier: ^11.0.0
+        version: 11.0.0(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))
+      '@nestjs/passport':
+        specifier: ^11.0.5
+        version: 11.0.5(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(passport@0.7.0)
+      '@nestjs/terminus':
+        specifier: ^11.0.0
+        version: 11.0.0(@grpc/grpc-js@1.13.4)(@grpc/proto-loader@0.7.15)(@nestjs/axios@4.0.0(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(axios@1.10.0)(rxjs@7.8.1))(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@11.1.3)(@nestjs/microservices@11.1.3)(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      '@nestjs/throttler':
+        specifier: ^6.4.0
+        version: 6.4.0(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@11.1.3)(reflect-metadata@0.1.14)
+      '@types/express':
+        specifier: ^5.0.3
+        version: 5.0.3
+      '@types/passport-jwt':
+        specifier: ^4.0.1
+        version: 4.0.1
+      express:
+        specifier: 5.1.0
+        version: 5.1.0
+      express-rate-limit:
+        specifier: ^7.5.1
+        version: 7.5.1(express@5.1.0)
+      helmet:
+        specifier: ^8.1.0
+        version: 8.1.0
+      http-proxy-middleware:
+        specifier: ^3.0.5
+        version: 3.0.5
+      passport:
+        specifier: ^0.7.0
+        version: 0.7.0
+      passport-jwt:
+        specifier: ^4.0.1
+        version: 4.0.1
+
+  apps/services/gateway-service-e2e: {}
+
+  apps/services/gateway-service/dist:
+    dependencies:
+      '@grpc/grpc-js':
+        specifier: 1.13.4
+        version: 1.13.4
+      '@grpc/proto-loader':
+        specifier: 0.7.15
+        version: 0.7.15
+      '@nestjs/axios':
+        specifier: 4.0.0
+        version: 4.0.0(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(axios@1.10.0)(rxjs@7.8.1)
+      '@nestjs/common':
+        specifier: 11.1.3
+        version: 11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      '@nestjs/config':
+        specifier: 4.0.2
+        version: 4.0.2(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(rxjs@7.8.1)
+      '@nestjs/core':
+        specifier: 11.1.3
+        version: 11.1.3(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/microservices@11.1.3)(@nestjs/platform-express@11.1.3)(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      '@nestjs/jwt':
+        specifier: ^11.0.0
+        version: 11.0.0(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))
+      '@nestjs/microservices':
+        specifier: 11.1.3
+        version: 11.1.3(@grpc/grpc-js@1.13.4)(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@11.1.3)(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      '@nestjs/passport':
+        specifier: ^11.0.5
+        version: 11.0.5(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(passport@0.7.0)
+      '@nestjs/platform-express':
+        specifier: 11.1.3
+        version: 11.1.3(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@11.1.3)
+      '@nestjs/terminus':
+        specifier: ^11.0.0
+        version: 11.0.0(@grpc/grpc-js@1.13.4)(@grpc/proto-loader@0.7.15)(@nestjs/axios@4.0.0(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(axios@1.10.0)(rxjs@7.8.1))(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@11.1.3)(@nestjs/microservices@11.1.3)(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      '@nestjs/throttler':
+        specifier: ^6.4.0
+        version: 6.4.0(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@11.1.3)(reflect-metadata@0.1.14)
+      '@prisma/client':
+        specifier: 6.11.1
+        version: 6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3)
+      '@types/passport-jwt':
+        specifier: ^4.0.1
+        version: 4.0.1
+      axios:
+        specifier: 1.10.0
+        version: 1.10.0
+      express:
+        specifier: 5.1.0
+        version: 5.1.0
+      express-rate-limit:
+        specifier: ^7.5.1
+        version: 7.5.1(express@5.1.0)
+      helmet:
+        specifier: ^8.1.0
+        version: 8.1.0
+      http-proxy-middleware:
+        specifier: ^3.0.5
+        version: 3.0.5
+      passport:
+        specifier: ^0.7.0
+        version: 0.7.0
+      passport-jwt:
+        specifier: ^4.0.1
+        version: 4.0.1
+      prisma:
+        specifier: 6.11.1
+        version: 6.11.1(typescript@5.8.3)
+      reflect-metadata:
+        specifier: 0.1.14
+        version: 0.1.14
+      rxjs:
+        specifier: 7.8.1
+        version: 7.8.1
+
   libs/core/config:
     dependencies:
       dotenv:
@@ -194,10 +310,6 @@ importers:
       supertest:
         specifier: ^7.1.1
         version: 7.1.1
-
-  libs/core/testing/services/auth-service: {}
-
-  libs/core/testing/services/auth-service-e2e: {}
 
   libs/core/types:
     dependencies:
@@ -1639,6 +1751,14 @@ packages:
       '@nestjs/websockets':
         optional: true
 
+  '@nestjs/jwt@11.0.0':
+    resolution:
+      {
+        integrity: sha512-v7YRsW3Xi8HNTsO+jeHSEEqelX37TVWgwt+BcxtkG/OfXJEOs6GZdbdza200d6KqId1pJQZ6UPj1F0M6E+mxaA==,
+      }
+    peerDependencies:
+      '@nestjs/common': ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0
+
   '@nestjs/microservices@11.1.3':
     resolution:
       {
@@ -1678,6 +1798,15 @@ packages:
       nats:
         optional: true
 
+  '@nestjs/passport@11.0.5':
+    resolution:
+      {
+        integrity: sha512-ulQX6mbjlws92PIM15Naes4F4p2JoxGnIJuUsdXQPT+Oo2sqQmENEZXM7eYuimocfHnKlcfZOuyzbA33LwUlOQ==,
+      }
+    peerDependencies:
+      '@nestjs/common': ^10.0.0 || ^11.0.0
+      passport: ^0.5.0 || ^0.6.0 || ^0.7.0
+
   '@nestjs/platform-express@11.1.3':
     resolution:
       {
@@ -1704,6 +1833,57 @@ packages:
     peerDependencies:
       typescript: '>=4.8.2'
 
+  '@nestjs/terminus@11.0.0':
+    resolution:
+      {
+        integrity: sha512-c55LOo9YGovmQHtFUMa/vDaxGZ2cglMTZejqgHREaApt/GArTfgYYGwhRXPLq8ZwiQQlLuYB+79e9iA8mlDSLA==,
+      }
+    peerDependencies:
+      '@grpc/grpc-js': '*'
+      '@grpc/proto-loader': '*'
+      '@mikro-orm/core': '*'
+      '@mikro-orm/nestjs': '*'
+      '@nestjs/axios': ^2.0.0 || ^3.0.0 || ^4.0.0
+      '@nestjs/common': ^10.0.0 || ^11.0.0
+      '@nestjs/core': ^10.0.0 || ^11.0.0
+      '@nestjs/microservices': ^10.0.0 || ^11.0.0
+      '@nestjs/mongoose': ^11.0.0
+      '@nestjs/sequelize': ^10.0.0 || ^11.0.0
+      '@nestjs/typeorm': ^10.0.0 || ^11.0.0
+      '@prisma/client': '*'
+      mongoose: '*'
+      reflect-metadata: 0.1.x || 0.2.x
+      rxjs: 7.x
+      sequelize: '*'
+      typeorm: '*'
+    peerDependenciesMeta:
+      '@grpc/grpc-js':
+        optional: true
+      '@grpc/proto-loader':
+        optional: true
+      '@mikro-orm/core':
+        optional: true
+      '@mikro-orm/nestjs':
+        optional: true
+      '@nestjs/axios':
+        optional: true
+      '@nestjs/microservices':
+        optional: true
+      '@nestjs/mongoose':
+        optional: true
+      '@nestjs/sequelize':
+        optional: true
+      '@nestjs/typeorm':
+        optional: true
+      '@prisma/client':
+        optional: true
+      mongoose:
+        optional: true
+      sequelize:
+        optional: true
+      typeorm:
+        optional: true
+
   '@nestjs/testing@11.1.3':
     resolution:
       {
@@ -1719,6 +1899,16 @@ packages:
         optional: true
       '@nestjs/platform-express':
         optional: true
+
+  '@nestjs/throttler@6.4.0':
+    resolution:
+      {
+        integrity: sha512-osL67i0PUuwU5nqSuJjtUJZMkxAnYB4VldgYUMGzvYRJDCqGRFMWbsbzm/CkUtPLRL30I8T74Xgt/OQxnYokiA==,
+      }
+    peerDependencies:
+      '@nestjs/common': ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0
+      '@nestjs/core': ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0
+      reflect-metadata: ^0.1.13 || ^0.2.0
 
   '@noble/hashes@1.8.0':
     resolution:
@@ -2463,10 +2653,22 @@ packages:
         integrity: sha512-N4LZ2xG7DatVqhCZzOGb1Yi5lMbXSZcmdLDe9EzSndPV2HpWYWzRbaerl2n27irrm94EPpprqa8KpskPT085+A==,
       }
 
+  '@types/express-serve-static-core@5.0.6':
+    resolution:
+      {
+        integrity: sha512-3xhRnjJPkULekpSzgtoNYYcTWgEZkp4myc+Saevii5JPnHNvHMRlBSHDbs7Bh1iPPoVTERHEZXyhyLbMEsExsA==,
+      }
+
   '@types/express@4.17.23':
     resolution:
       {
         integrity: sha512-Crp6WY9aTYP3qPi2wGDo9iUe/rceX01UMhnF1jmwDcKCFM6cx7YhGP/Mpr3y9AASpfHixIG0E6azCcL5OcDHsQ==,
+      }
+
+  '@types/express@5.0.3':
+    resolution:
+      {
+        integrity: sha512-wGA0NX93b19/dZC1J18tKWVIYWyyF2ZjT9vin/NRu0qzzvfVzWjs04iq2rQ3H65vCTQYlRqs3YHfY7zjdV+9Kw==,
       }
 
   '@types/graceful-fs@4.1.9':
@@ -2511,6 +2713,18 @@ packages:
         integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==,
       }
 
+  '@types/jsonwebtoken@9.0.10':
+    resolution:
+      {
+        integrity: sha512-asx5hIG9Qmf/1oStypjanR7iKTv0gXQ1Ov/jfrX6kS/EO0OFni8orbmGCn0672NHR3kXHwpAwR+B368ZGN/2rA==,
+      }
+
+  '@types/jsonwebtoken@9.0.7':
+    resolution:
+      {
+        integrity: sha512-ugo316mmTYBl2g81zDFnZ7cfxlut3o+/EQdaP7J8QN2kY6lJ22hmQYCK5EHcJHbrW+dkCGSCPgbG8JtYj6qSrg==,
+      }
+
   '@types/linkify-it@5.0.0':
     resolution:
       {
@@ -2547,6 +2761,12 @@ packages:
         integrity: sha512-/pyBZWSLD2n0dcHE3hq8s8ZvcETHtEuF+3E7XVt0Ig2nvsVQXdghHVcEkIWjy9A0wKfTn97a/PSDYohKIlnP/w==,
       }
 
+  '@types/ms@2.1.0':
+    resolution:
+      {
+        integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==,
+      }
+
   '@types/node-forge@1.3.12':
     resolution:
       {
@@ -2563,6 +2783,24 @@ packages:
     resolution:
       {
         integrity: sha512-dISoDXWWQwUquiKsyZ4Ng+HX2KsPL7LyHKHQwgGFEA3IaKac4Obd+h2a/a6waisAoepJlBcx9paWqjA8/HVjCw==,
+      }
+
+  '@types/passport-jwt@4.0.1':
+    resolution:
+      {
+        integrity: sha512-Y0Ykz6nWP4jpxgEUYq8NoVZeCQPo1ZndJLfapI249g1jHChvRfZRO/LS3tqu26YgAS/laI1qx98sYGz0IalRXQ==,
+      }
+
+  '@types/passport-strategy@0.2.38':
+    resolution:
+      {
+        integrity: sha512-GC6eMqqojOooq993Tmnmp7AUTbbQSgilyvpCYQjT+H6JfG/g6RGc7nXEniZlp0zyKJ0WUdOiZWLBZft9Yug1uA==,
+      }
+
+  '@types/passport@1.0.17':
+    resolution:
+      {
+        integrity: sha512-aciLyx+wDwT2t2/kJGJR2AEeBz0nJU4WuRX04Wu9Dqc5lSUtwu0WERPHYsLhF9PtseiAMPBGNUOtFjxZ56prsg==,
       }
 
   '@types/pino@7.0.5':
@@ -3135,6 +3373,12 @@ packages:
         integrity: sha512-B/gBuNg5SiMTrPkC+A2+cW0RszwxYmn6VYxB/inlBStS5nx6xHIt/ehKRhIMhqusl7a8LjQoZnjCs5vhwxOQ1g==,
       }
 
+  ansi-align@3.0.1:
+    resolution:
+      {
+        integrity: sha512-IOfwwBF5iczOjp/WeY4YxyjqAFMQoZufdQWDd19SEExbVLNXqvpzSJ/M7Za4/sCPmQ0+GRquoA7bGcINcxew6w==,
+      }
+
   ansi-colors@4.1.3:
     resolution:
       {
@@ -3523,6 +3767,13 @@ packages:
         integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==,
       }
 
+  boxen@5.1.2:
+    resolution:
+      {
+        integrity: sha512-9gYgQKXx+1nP8mP7CzFyaUARhg7D3n1dF/FnErWmu9l6JvGpNUN278h0aSb+QjoiKSWG+iZ3uHrcqk0qrY9RQQ==,
+      }
+    engines: { node: '>=10' }
+
   brace-expansion@1.1.12:
     resolution:
       {
@@ -3694,6 +3945,13 @@ packages:
       }
     engines: { node: '>=10' }
 
+  check-disk-space@3.4.0:
+    resolution:
+      {
+        integrity: sha512-drVkSqfwA+TvuEhFipiR1OC9boEGZL5RrWvVsOthdcvQNXyCCuKkEiTOTXZ7qxSf/GLwq4GvzfrQD/Wz325hgw==,
+      }
+    engines: { node: '>=16' }
+
   chokidar@3.6.0:
     resolution:
       {
@@ -3727,6 +3985,13 @@ packages:
       {
         integrity: sha512-9z8TZaGM1pfswYeXrUpzPrkx8UnWYdhJclsiYMm6x/w5+nN+8Tf/LnAgfLGQCm59qAOxU8WwHEq2vNwF6i4j+Q==,
       }
+
+  cli-boxes@2.2.1:
+    resolution:
+      {
+        integrity: sha512-y4coMcylgSCdVinjiDBuR8PCC2bLjyGTwEmPb9NHR/QaNU6EUOXcTY/s6VjGMD6ENSEaeQYHCY0GNGS5jfMwPw==,
+      }
+    engines: { node: '>=6' }
 
   cli-cursor@3.1.0:
     resolution:
@@ -4851,6 +5116,15 @@ packages:
         integrity: sha512-MTjE2eIbHv5DyfuFz4zLYWxpqVhEhkTiwFGuB74Q9CSou2WHO52nlE5y3Zlg6SIsiYUIPj6ifFxnkPz6O3sIUg==,
       }
 
+  express-rate-limit@7.5.1:
+    resolution:
+      {
+        integrity: sha512-7iN8iPMDzOMHPUYllBEsQdWVB6fPDMPqwjBaFrgr4Jgr/+okjvzAy+UHlYYL/Vs0OsOrMkwS6PJDkFlJwoxUnw==,
+      }
+    engines: { node: '>= 16' }
+    peerDependencies:
+      express: '>= 4.11'
+
   express@4.21.2:
     resolution:
       {
@@ -5409,6 +5683,13 @@ packages:
       }
     hasBin: true
 
+  helmet@8.1.0:
+    resolution:
+      {
+        integrity: sha512-jOiHyAZsmnr8LqoPGmCjYAaiuWwjAPLgY8ZX2XrmHawt99/u1y6RgrZMTeoPfpUbV96HOalYgz1qzkRbw54Pmg==,
+      }
+    engines: { node: '>=18.0.0' }
+
   help-me@5.0.0:
     resolution:
       {
@@ -5478,6 +5759,13 @@ packages:
     peerDependenciesMeta:
       '@types/express':
         optional: true
+
+  http-proxy-middleware@3.0.5:
+    resolution:
+      {
+        integrity: sha512-GLZZm1X38BPY4lkXA01jhwxvDoOkkXqjgVyUzVxiEK4iuRu03PZoYHhHRwxnfhQMDuaxi3vVri0YgSro/1oWqg==,
+      }
+    engines: { node: ^14.15.0 || ^16.10.0 || >=18.0.0 }
 
   http-proxy@1.18.1:
     resolution:
@@ -5799,6 +6087,13 @@ packages:
     resolution:
       {
         integrity: sha512-h5PpgXkWitc38BBMYawTYMWJHFZJVnBquFE57xFpjB8pJFiF6gZ+bU+WyI/yqXiFR5mdLsgYNaPe8uao6Uv9Og==,
+      }
+    engines: { node: '>=0.10.0' }
+
+  is-plain-object@5.0.0:
+    resolution:
+      {
+        integrity: sha512-VRSzKkbMm5jMDoKLbltAkFQ5Qr7VDiTFGXxYFXXowVj387GeGNOCsOH6Msy00SGZ3Fp84b1Naa1psqgcCIEP5Q==,
       }
     engines: { node: '>=0.10.0' }
 
@@ -7306,6 +7601,26 @@ packages:
       }
     engines: { node: '>= 0.8' }
 
+  passport-jwt@4.0.1:
+    resolution:
+      {
+        integrity: sha512-UCKMDYhNuGOBE9/9Ycuoyh7vP6jpeTp/+sfMJl7nLff/t6dps+iaeE0hhNkKN8/HZHcJ7lCdOyDxHdDoxoSvdQ==,
+      }
+
+  passport-strategy@1.0.0:
+    resolution:
+      {
+        integrity: sha512-CB97UUvDKJde2V0KDWWB3lyf6PC3FaZP7YxZ2G8OAtn9p4HI9j9JLP9qjOGZFvyl8uwNT8qM+hGnz/n16NI7oA==,
+      }
+    engines: { node: '>= 0.4.0' }
+
+  passport@0.7.0:
+    resolution:
+      {
+        integrity: sha512-cPLl+qZpSc+ireUvt+IzqbED1cHHkDoVYMo30jbJIdOOjQ1MQYZBPiNvmi8UM6lJuOpTPXJGZQk0DtC4y61MYQ==,
+      }
+    engines: { node: '>= 0.4.0' }
+
   path-exists@4.0.0:
     resolution:
       {
@@ -7366,6 +7681,12 @@ packages:
         integrity: sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==,
       }
     engines: { node: '>=8' }
+
+  pause@0.0.1:
+    resolution:
+      {
+        integrity: sha512-KG8UEiEVkR3wGEb4m5yZkVCzigAD+cVEJck2CzYZO37ZGJfctvVptVO192MwrtPhzONn6go8ylnOdMhKqi4nfg==,
+      }
 
   peek-stream@1.1.3:
     resolution:
@@ -9290,6 +9611,13 @@ packages:
       }
     engines: { node: '>=4' }
 
+  type-fest@0.20.2:
+    resolution:
+      {
+        integrity: sha512-Ne+eE4r0/iWnpAxD852z3A+N0Bt5RN//NjJwRd2VFHEmrywxf5vsZlh4R6lixl6B+wz/8d+maTSAkN1FIkI3LQ==,
+      }
+    engines: { node: '>=10' }
+
   type-fest@0.21.3:
     resolution:
       {
@@ -9684,6 +10012,13 @@ packages:
       }
     engines: { node: '>= 8' }
     hasBin: true
+
+  widest-line@3.1.0:
+    resolution:
+      {
+        integrity: sha512-NsmoXalsWVDMGupxZ5R08ka9flZjjiLvHVAWYOKtiKM8ujtZWr9cRffak+uSE48+Ob8ObalXpwyeUiyDD6QFgg==,
+      }
+    engines: { node: '>=8' }
 
   wildcard@2.0.1:
     resolution:
@@ -10992,6 +11327,12 @@ snapshots:
       '@nestjs/microservices': 11.1.3(@grpc/grpc-js@1.13.4)(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@11.1.3)(reflect-metadata@0.1.14)(rxjs@7.8.1)
       '@nestjs/platform-express': 11.1.3(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@11.1.3)
 
+  '@nestjs/jwt@11.0.0(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))':
+    dependencies:
+      '@nestjs/common': 11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      '@types/jsonwebtoken': 9.0.7
+      jsonwebtoken: 9.0.2
+
   '@nestjs/microservices@11.1.3(@grpc/grpc-js@1.13.4)(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@11.1.3)(reflect-metadata@0.1.14)(rxjs@7.8.1)':
     dependencies:
       '@nestjs/common': 11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1)
@@ -11002,6 +11343,11 @@ snapshots:
       tslib: 2.8.1
     optionalDependencies:
       '@grpc/grpc-js': 1.13.4
+
+  '@nestjs/passport@11.0.5(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(passport@0.7.0)':
+    dependencies:
+      '@nestjs/common': 11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      passport: 0.7.0
 
   '@nestjs/platform-express@11.1.3(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@11.1.3)':
     dependencies:
@@ -11032,6 +11378,21 @@ snapshots:
     transitivePeerDependencies:
       - chokidar
 
+  '@nestjs/terminus@11.0.0(@grpc/grpc-js@1.13.4)(@grpc/proto-loader@0.7.15)(@nestjs/axios@4.0.0(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(axios@1.10.0)(rxjs@7.8.1))(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@11.1.3)(@nestjs/microservices@11.1.3)(@prisma/client@6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3))(reflect-metadata@0.1.14)(rxjs@7.8.1)':
+    dependencies:
+      '@nestjs/common': 11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      '@nestjs/core': 11.1.3(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/microservices@11.1.3)(@nestjs/platform-express@11.1.3)(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      boxen: 5.1.2
+      check-disk-space: 3.4.0
+      reflect-metadata: 0.1.14
+      rxjs: 7.8.1
+    optionalDependencies:
+      '@grpc/grpc-js': 1.13.4
+      '@grpc/proto-loader': 0.7.15
+      '@nestjs/axios': 4.0.0(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(axios@1.10.0)(rxjs@7.8.1)
+      '@nestjs/microservices': 11.1.3(@grpc/grpc-js@1.13.4)(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@11.1.3)(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      '@prisma/client': 6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3)
+
   '@nestjs/testing@11.1.3(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@11.1.3)(@nestjs/microservices@11.1.3)(@nestjs/platform-express@11.1.3)':
     dependencies:
       '@nestjs/common': 11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1)
@@ -11040,6 +11401,12 @@ snapshots:
     optionalDependencies:
       '@nestjs/microservices': 11.1.3(@grpc/grpc-js@1.13.4)(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@11.1.3)(reflect-metadata@0.1.14)(rxjs@7.8.1)
       '@nestjs/platform-express': 11.1.3(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@11.1.3)
+
+  '@nestjs/throttler@6.4.0(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@11.1.3)(reflect-metadata@0.1.14)':
+    dependencies:
+      '@nestjs/common': 11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      '@nestjs/core': 11.1.3(@nestjs/common@11.1.3(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/microservices@11.1.3)(@nestjs/platform-express@11.1.3)(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      reflect-metadata: 0.1.14
 
   '@noble/hashes@1.8.0': {}
 
@@ -11668,11 +12035,24 @@ snapshots:
       '@types/range-parser': 1.2.7
       '@types/send': 0.17.5
 
+  '@types/express-serve-static-core@5.0.6':
+    dependencies:
+      '@types/node': 18.16.9
+      '@types/qs': 6.14.0
+      '@types/range-parser': 1.2.7
+      '@types/send': 0.17.5
+
   '@types/express@4.17.23':
     dependencies:
       '@types/body-parser': 1.19.6
       '@types/express-serve-static-core': 4.19.6
       '@types/qs': 6.14.0
+      '@types/serve-static': 1.15.8
+
+  '@types/express@5.0.3':
+    dependencies:
+      '@types/body-parser': 1.19.6
+      '@types/express-serve-static-core': 5.0.6
       '@types/serve-static': 1.15.8
 
   '@types/graceful-fs@4.1.9':
@@ -11697,6 +12077,15 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
+  '@types/jsonwebtoken@9.0.10':
+    dependencies:
+      '@types/ms': 2.1.0
+      '@types/node': 18.16.9
+
+  '@types/jsonwebtoken@9.0.7':
+    dependencies:
+      '@types/node': 18.16.9
+
   '@types/linkify-it@5.0.0': {}
 
   '@types/luxon@3.6.2': {}
@@ -11712,6 +12101,8 @@ snapshots:
 
   '@types/mime@1.3.5': {}
 
+  '@types/ms@2.1.0': {}
+
   '@types/node-forge@1.3.12':
     dependencies:
       '@types/node': 18.16.9
@@ -11719,6 +12110,20 @@ snapshots:
   '@types/node@18.16.9': {}
 
   '@types/parse-json@4.0.2': {}
+
+  '@types/passport-jwt@4.0.1':
+    dependencies:
+      '@types/jsonwebtoken': 9.0.10
+      '@types/passport-strategy': 0.2.38
+
+  '@types/passport-strategy@0.2.38':
+    dependencies:
+      '@types/express': 5.0.3
+      '@types/passport': 1.0.17
+
+  '@types/passport@1.0.17':
+    dependencies:
+      '@types/express': 5.0.3
 
   '@types/pino@7.0.5':
     dependencies:
@@ -12179,6 +12584,10 @@ snapshots:
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
+  ansi-align@3.0.1:
+    dependencies:
+      string-width: 4.2.3
+
   ansi-colors@4.1.3: {}
 
   ansi-escapes@4.3.2:
@@ -12256,7 +12665,7 @@ snapshots:
 
   axios@1.10.0:
     dependencies:
-      follow-redirects: 1.15.9
+      follow-redirects: 1.15.9(debug@4.4.1)
       form-data: 4.0.3
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
@@ -12441,6 +12850,17 @@ snapshots:
 
   boolbase@1.0.0: {}
 
+  boxen@5.1.2:
+    dependencies:
+      ansi-align: 3.0.1
+      camelcase: 6.3.0
+      chalk: 4.1.2
+      cli-boxes: 2.2.1
+      string-width: 4.2.3
+      type-fest: 0.20.2
+      widest-line: 3.1.0
+      wrap-ansi: 7.0.0
+
   brace-expansion@1.1.12:
     dependencies:
       balanced-match: 1.0.2
@@ -12535,6 +12955,8 @@ snapshots:
 
   char-regex@1.0.2: {}
 
+  check-disk-space@3.4.0: {}
+
   chokidar@3.6.0:
     dependencies:
       anymatch: 3.1.3
@@ -12556,6 +12978,8 @@ snapshots:
   ci-info@3.9.0: {}
 
   cjs-module-lexer@1.4.3: {}
+
+  cli-boxes@2.2.1: {}
 
   cli-cursor@3.1.0:
     dependencies:
@@ -12639,7 +13063,7 @@ snapshots:
 
   compressible@2.0.18:
     dependencies:
-      mime-db: 1.52.0
+      mime-db: 1.54.0
 
   compression@1.8.0:
     dependencies:
@@ -13177,6 +13601,10 @@ snapshots:
 
   express-rate-limit@5.5.1: {}
 
+  express-rate-limit@7.5.1(express@5.1.0):
+    dependencies:
+      express: 5.1.0
+
   express@4.21.2:
     dependencies:
       accepts: 1.3.8
@@ -13372,7 +13800,9 @@ snapshots:
 
   flatted@3.3.3: {}
 
-  follow-redirects@1.15.9: {}
+  follow-redirects@1.15.9(debug@4.4.1):
+    optionalDependencies:
+      debug: 4.4.1
 
   foreground-child@3.3.1:
     dependencies:
@@ -13566,6 +13996,8 @@ snapshots:
 
   he@1.2.0: {}
 
+  helmet@8.1.0: {}
+
   help-me@5.0.0: {}
 
   hosted-git-info@7.0.2:
@@ -13607,7 +14039,7 @@ snapshots:
   http-proxy-middleware@2.0.9(@types/express@4.17.23):
     dependencies:
       '@types/http-proxy': 1.17.16
-      http-proxy: 1.18.1
+      http-proxy: 1.18.1(debug@4.4.1)
       is-glob: 4.0.3
       is-plain-obj: 3.0.0
       micromatch: 4.0.8
@@ -13616,10 +14048,21 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  http-proxy@1.18.1:
+  http-proxy-middleware@3.0.5:
+    dependencies:
+      '@types/http-proxy': 1.17.16
+      debug: 4.4.1
+      http-proxy: 1.18.1(debug@4.4.1)
+      is-glob: 4.0.3
+      is-plain-object: 5.0.0
+      micromatch: 4.0.8
+    transitivePeerDependencies:
+      - supports-color
+
+  http-proxy@1.18.1(debug@4.4.1):
     dependencies:
       eventemitter3: 4.0.7
-      follow-redirects: 1.15.9
+      follow-redirects: 1.15.9(debug@4.4.1)
       requires-port: 1.0.0
     transitivePeerDependencies:
       - debug
@@ -13631,7 +14074,7 @@ snapshots:
       corser: 2.0.1
       he: 1.2.0
       html-encoding-sniffer: 3.0.0
-      http-proxy: 1.18.1
+      http-proxy: 1.18.1(debug@4.4.1)
       mime: 1.6.0
       minimist: 1.2.8
       opener: 1.5.2
@@ -13769,6 +14212,8 @@ snapshots:
   is-plain-object@2.0.4:
     dependencies:
       isobject: 3.0.1
+
+  is-plain-object@5.0.0: {}
 
   is-promise@2.2.2: {}
 
@@ -14826,6 +15271,19 @@ snapshots:
 
   parseurl@1.3.3: {}
 
+  passport-jwt@4.0.1:
+    dependencies:
+      jsonwebtoken: 9.0.2
+      passport-strategy: 1.0.0
+
+  passport-strategy@1.0.0: {}
+
+  passport@0.7.0:
+    dependencies:
+      passport-strategy: 1.0.0
+      pause: 0.0.1
+      utils-merge: 1.0.1
+
   path-exists@4.0.0: {}
 
   path-exists@5.0.0: {}
@@ -14846,6 +15304,8 @@ snapshots:
   path-to-regexp@8.2.0: {}
 
   path-type@4.0.0: {}
+
+  pause@0.0.1: {}
 
   peek-stream@1.1.3:
     dependencies:
@@ -16035,6 +16495,8 @@ snapshots:
 
   type-detect@4.0.8: {}
 
+  type-fest@0.20.2: {}
+
   type-fest@0.21.3: {}
 
   type-is@1.6.18:
@@ -16341,6 +16803,10 @@ snapshots:
   which@2.0.2:
     dependencies:
       isexe: 2.0.0
+
+  widest-line@3.1.0:
+    dependencies:
+      string-width: 4.2.3
 
   wildcard@2.0.1: {}
 
