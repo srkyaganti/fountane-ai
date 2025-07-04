@@ -22,10 +22,7 @@
       "path": "./libs/core/proto"
     },
     {
-      "path": "./apps/services/auth-service"
-    },
-    {
-      "path": "./apps/services/auth-service-e2e"
+      "path": "./apps/services/feature-service"
     }
   ]
 }

@@ -98,3 +98,5 @@ generated/
 
 # Claude AI files
 .claude/
+
+test-output
