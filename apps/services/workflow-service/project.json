@@ -1,0 +1,62 @@
+{
+  "name": "workflow-service",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/services/workflow-service/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/services/workflow-service",
+        "main": "apps/services/workflow-service/src/main.ts",
+        "tsConfig": "apps/services/workflow-service/tsconfig.app.json",
+        "webpackConfig": "apps/services/workflow-service/webpack.config.js",
+        "assets": ["apps/services/workflow-service/src/assets"],
+        "generatePackageJson": true
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "workflow-service:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "workflow-service:build:development"
+        },
+        "production": {
+          "buildTarget": "workflow-service:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/services/workflow-service/jest.config.ts"
+      }
+    },
+    "docker-build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "docker build -f apps/services/workflow-service/Dockerfile -t workflow-service:latest ."
+        ]
+      }
+    }
+  },
+  "tags": []
+}
