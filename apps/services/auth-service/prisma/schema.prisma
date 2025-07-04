@@ -1,0 +1,151 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../../node_modules/.prisma/auth-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Audit log for all authentication events
+model AuthAuditLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  tenantId    String
+  event       AuthEvent
+  success     Boolean
+  ipAddress   String?
+  userAgent   String?
+  metadata    Json?
+  errorCode   String?
+  errorMessage String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([tenantId])
+  @@index([event])
+  @@index([createdAt])
+  @@map("auth_audit_logs")
+}
+
+// Session management for active sessions
+model UserSession {
+  id           String   @id @default(uuid())
+  userId       String
+  tenantId     String
+  accessToken  String   @unique
+  refreshToken String   @unique
+  ipAddress    String?
+  userAgent    String?
+  lastActivity DateTime @default(now())
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+  @@index([tenantId])
+  @@index([accessToken])
+  @@index([refreshToken])
+  @@index([expiresAt])
+  @@map("user_sessions")
+}
+
+// Token blacklist for revoked tokens
+model RevokedToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  tokenType TokenType
+  userId    String
+  revokedBy String
+  reason    String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([expiresAt])
+  @@map("revoked_tokens")
+}
+
+// Cache for user permissions (denormalized for performance)
+model UserPermissionCache {
+  id          String   @id @default(uuid())
+  userId      String
+  tenantId    String
+  permissions Json     // Array of permission strings
+  roles       Json     // Array of role names
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, tenantId])
+  @@index([userId])
+  @@index([tenantId])
+  @@index([expiresAt])
+  @@map("user_permission_cache")
+}
+
+// API keys for service-to-service authentication
+model ApiKey {
+  id          String    @id @default(uuid())
+  name        String
+  key         String    @unique
+  serviceId   String
+  tenantId    String
+  permissions Json      // Array of allowed operations
+  rateLimit   Int?      // Requests per minute
+  expiresAt   DateTime?
+  lastUsedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  revokedAt   DateTime?
+
+  @@index([key])
+  @@index([serviceId])
+  @@index([tenantId])
+  @@map("api_keys")
+}
+
+// Rate limiting tracking
+model RateLimitEntry {
+  id        String   @id @default(uuid())
+  key       String   // Can be userId, IP, or API key
+  bucket    String   // e.g., "auth", "api", "refresh"
+  count     Int      @default(0)
+  windowStart DateTime
+  expiresAt DateTime
+
+  @@unique([key, bucket])
+  @@index([key])
+  @@index([bucket])
+  @@index([expiresAt])
+  @@map("rate_limit_entries")
+}
+
+enum AuthEvent {
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+  LOGOUT
+  TOKEN_REFRESH
+  TOKEN_VALIDATE
+  TOKEN_REVOKE
+  PASSWORD_CHANGE
+  PASSWORD_RESET
+  USER_CREATE
+  USER_UPDATE
+  USER_DELETE
+  ROLE_ASSIGN
+  ROLE_REVOKE
+  API_KEY_CREATE
+  API_KEY_REVOKE
+  SUSPICIOUS_ACTIVITY
+}
+
+enum TokenType {
+  ACCESS
+  REFRESH
+  API_KEY
+}

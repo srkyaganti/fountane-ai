@@ -1,0 +1,111 @@
+version: '3.8'
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0
+    container_name: fountane-keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KC_HOSTNAME_STRICT: false
+      KC_HTTP_ENABLED: true
+    command:
+      - start-dev
+    ports:
+      - '8080:8080'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - fountane-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health/ready']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: fountane-postgres-auth
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_MULTIPLE_DATABASES: keycloak:keycloak:keycloak,auth_service:fountane:fountane_dev_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/create-multiple-databases.sh:/docker-entrypoint-initdb.d/create-multiple-databases.sh
+    ports:
+      - '5433:5432'
+    networks:
+      - fountane-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth-service:
+    build:
+      context: ../../..
+      dockerfile: apps/services/auth-service/Dockerfile
+    container_name: fountane-auth-service
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: info
+      DATABASE_URL: postgresql://fountane:fountane_dev_password@postgres:5432/auth_service?schema=public
+      KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8080
+      KEYCLOAK_REALM: fountane
+      KEYCLOAK_CLIENT_ID: fountane-auth-service
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:-secret}
+      KEYCLOAK_ADMIN_USERNAME: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      SESSION_TTL: 3600
+      PERMISSION_CACHE_TTL: 300
+      RATE_LIMIT_AUTH: 10
+    ports:
+      - '50051:50051'
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    networks:
+      - fountane-network
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('net').createConnection({port: 50051}, () => process.exit(0)).on('error', () => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+
+  # Optional: gRPC UI for testing
+  grpcui:
+    image: fullstorydev/grpcui:latest
+    container_name: fountane-grpcui
+    command:
+      - -plaintext
+      - -port
+      - '8081'
+      - auth-service:50051
+    ports:
+      - '8081:8081'
+    depends_on:
+      - auth-service
+    networks:
+      - fountane-network
+
+volumes:
+  postgres_data:
+
+networks:
+  fountane-network:
+    driver: bridge

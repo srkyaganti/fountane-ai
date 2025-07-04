@@ -1,0 +1,23 @@
+{
+  "name": "@fountane/core/proto",
+  "version": "0.0.1",
+  "type": "commonjs",
+  "main": "./generated/auth.js",
+  "types": "./generated/auth.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./generated/auth.d.ts",
+      "import": "./generated/auth.js",
+      "default": "./generated/auth.js"
+    }
+  },
+  "files": [
+    "generated",
+    "*.proto",
+    "!**/*.tsbuildinfo"
+  ],
+  "dependencies": {
+    "protobufjs": "^7.5.3"
+  }
+}

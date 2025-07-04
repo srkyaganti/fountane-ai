@@ -14,6 +14,18 @@
     },
     {
       "path": "./libs/core/config"
+    },
+    {
+      "path": "./libs/core/testing"
+    },
+    {
+      "path": "./libs/core/proto"
+    },
+    {
+      "path": "./apps/services/auth-service"
+    },
+    {
+      "path": "./apps/services/auth-service-e2e"
     }
   ]
 }

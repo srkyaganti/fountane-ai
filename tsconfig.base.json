@@ -37,6 +37,7 @@
       "@fountane/*": ["libs/*/src/index.ts"],
       "@fountane/backend/*": ["libs/backend/*/src/index.ts"],
       "@fountane/core/*": ["libs/core/*/src/index.ts"],
+      "@fountane/core/proto": ["libs/core/proto/generated/auth"],
       "@fountane/frontend/*": ["libs/frontend/*/src/index.ts"]
     }
   }
