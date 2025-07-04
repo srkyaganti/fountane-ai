@@ -1,0 +1,214 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../../node_modules/.prisma/workflow-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Workflow definitions
+model Workflow {
+  id          String         @id @default(uuid())
+  name        String
+  description String?
+  tenantId    String
+  version     Int            @default(1)
+  status      WorkflowStatus @default(DRAFT)
+  definition  Json           // WorkflowDefinition stored as JSON
+  metadata    Json?          // Additional metadata
+  createdBy   String
+  updatedBy   String
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  // Relations
+  executions  Execution[]
+  templates   WorkflowTemplate[]
+
+  @@index([tenantId])
+  @@index([status])
+  @@unique([tenantId, name, version])
+  @@map("workflows")
+}
+
+// Workflow executions
+model Execution {
+  id               String          @id @default(uuid())
+  workflowId       String
+  workflow         Workflow        @relation(fields: [workflowId], references: [id])
+  tenantId         String
+  status           ExecutionStatus @default(PENDING)
+  inputParameters  Json?           // Input parameters as JSON
+  outputData       Json?           // Output data as JSON
+  errorMessage     String?
+  triggeredBy      String
+  startedAt        DateTime        @default(now())
+  completedAt      DateTime?
+  metadata         Json?           // Additional metadata
+
+  // Relations
+  tasks            TaskExecution[]
+  logs             ExecutionLog[]
+
+  @@index([workflowId])
+  @@index([tenantId])
+  @@index([status])
+  @@index([startedAt])
+  @@map("executions")
+}
+
+// Task executions within workflow executions
+model TaskExecution {
+  id           String     @id @default(uuid())
+  executionId  String
+  execution    Execution  @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  stepId       String     // Reference to step in workflow definition
+  name         String
+  status       TaskStatus @default(PENDING)
+  inputData    Json?      // Input data as JSON
+  outputData   Json?      // Output data as JSON
+  errorMessage String?
+  retryCount   Int        @default(0)
+  startedAt    DateTime   @default(now())
+  completedAt  DateTime?
+
+  @@index([executionId])
+  @@index([status])
+  @@map("task_executions")
+}
+
+// Execution logs for monitoring
+model ExecutionLog {
+  id          String   @id @default(uuid())
+  executionId String
+  execution   Execution @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  taskId      String?   // Optional reference to specific task
+  level       LogLevel
+  message     String
+  metadata    Json?     // Additional context as JSON
+  timestamp   DateTime  @default(now())
+
+  @@index([executionId])
+  @@index([taskId])
+  @@index([level])
+  @@index([timestamp])
+  @@map("execution_logs")
+}
+
+// Workflow templates
+model WorkflowTemplate {
+  id               String   @id @default(uuid())
+  name             String
+  description      String?
+  category         String
+  workflowId       String?  // Optional reference to source workflow
+  workflow         Workflow? @relation(fields: [workflowId], references: [id])
+  definition       Json     // WorkflowDefinition stored as JSON
+  parameterSchemas Json?    // Parameter schemas as JSON
+  tags             String[] // Array of tags
+  metadata         Json?    // Additional metadata
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([category])
+  @@unique([name])
+  @@map("workflow_templates")
+}
+
+// Workflow triggers (webhooks, schedules, etc.)
+model WorkflowTrigger {
+  id         String      @id @default(uuid())
+  workflowId String
+  type       TriggerType
+  config     Json        // Trigger configuration as JSON
+  enabled    Boolean     @default(true)
+  lastRun    DateTime?
+  nextRun    DateTime?   // For scheduled triggers
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@index([workflowId])
+  @@index([type])
+  @@index([enabled])
+  @@map("workflow_triggers")
+}
+
+// n8n integration - store n8n workflow IDs and mappings
+model N8nMapping {
+  id             String   @id @default(uuid())
+  workflowId     String   @unique
+  n8nWorkflowId  String   // n8n's internal workflow ID
+  n8nWebhookUrl  String?  // n8n webhook URL if applicable
+  syncStatus     String   // 'synced', 'pending', 'error'
+  lastSyncedAt   DateTime?
+  syncError      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([n8nWorkflowId])
+  @@map("n8n_mappings")
+}
+
+// Workflow metrics for analytics
+model WorkflowMetrics {
+  id                    String   @id @default(uuid())
+  workflowId            String
+  date                  DateTime @db.Date
+  totalExecutions       Int      @default(0)
+  successfulExecutions  Int      @default(0)
+  failedExecutions      Int      @default(0)
+  cancelledExecutions   Int      @default(0)
+  averageDurationMs     Int?     // Average duration in milliseconds
+  errorCounts           Json?    // Map of error types to counts
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@unique([workflowId, date])
+  @@index([workflowId])
+  @@index([date])
+  @@map("workflow_metrics")
+}
+
+// Enums
+enum WorkflowStatus {
+  DRAFT
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum ExecutionStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+  TIMED_OUT
+}
+
+enum TaskStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  SKIPPED
+  CANCELLED
+}
+
+enum TriggerType {
+  WEBHOOK
+  SCHEDULE
+  EVENT
+}
+
+enum LogLevel {
+  DEBUG
+  INFO
+  WARN
+  ERROR
+}

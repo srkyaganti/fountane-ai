@@ -1,0 +1,413 @@
+syntax = "proto3";
+
+package fountane.workflow;
+
+service WorkflowService {
+  // Workflow Management
+  rpc CreateWorkflow(CreateWorkflowRequest) returns (Workflow);
+  rpc UpdateWorkflow(UpdateWorkflowRequest) returns (Workflow);
+  rpc DeleteWorkflow(DeleteWorkflowRequest) returns (Empty);
+  rpc GetWorkflow(GetWorkflowRequest) returns (Workflow);
+  rpc ListWorkflows(ListWorkflowsRequest) returns (ListWorkflowsResponse);
+  
+  // Execution Management
+  rpc ExecuteWorkflow(ExecuteWorkflowRequest) returns (Execution);
+  rpc GetExecution(GetExecutionRequest) returns (Execution);
+  rpc ListExecutions(ListExecutionsRequest) returns (ListExecutionsResponse);
+  rpc CancelExecution(CancelExecutionRequest) returns (Empty);
+  rpc RetryExecution(RetryExecutionRequest) returns (Execution);
+  
+  // Template Management
+  rpc CreateTemplate(CreateTemplateRequest) returns (WorkflowTemplate);
+  rpc ListTemplates(ListTemplatesRequest) returns (ListTemplatesResponse);
+  rpc InstantiateTemplate(InstantiateTemplateRequest) returns (Workflow);
+  
+  // Monitoring
+  rpc GetWorkflowMetrics(GetWorkflowMetricsRequest) returns (WorkflowMetrics);
+  rpc StreamExecutionLogs(StreamExecutionLogsRequest) returns (stream ExecutionLog);
+}
+
+// Empty message for operations that return no data
+message Empty {}
+
+// Workflow Management Messages
+message CreateWorkflowRequest {
+  string name = 1;
+  string description = 2;
+  string tenant_id = 3;
+  WorkflowDefinition definition = 4;
+  map<string, string> metadata = 5;
+}
+
+message UpdateWorkflowRequest {
+  string workflow_id = 1;
+  optional string name = 2;
+  optional string description = 3;
+  optional WorkflowDefinition definition = 4;
+  map<string, string> metadata = 5;
+}
+
+message DeleteWorkflowRequest {
+  string workflow_id = 1;
+}
+
+message GetWorkflowRequest {
+  string workflow_id = 1;
+}
+
+message ListWorkflowsRequest {
+  string tenant_id = 1;
+  optional int32 page_size = 2;
+  optional string page_token = 3;
+  optional WorkflowStatus status = 4;
+}
+
+message ListWorkflowsResponse {
+  repeated Workflow workflows = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+// Execution Management Messages
+message ExecuteWorkflowRequest {
+  string workflow_id = 1;
+  map<string, string> input_parameters = 2;
+  optional string trigger_id = 3;
+  map<string, string> metadata = 4;
+}
+
+message GetExecutionRequest {
+  string execution_id = 1;
+}
+
+message ListExecutionsRequest {
+  optional string workflow_id = 1;
+  optional string tenant_id = 2;
+  optional ExecutionStatus status = 3;
+  optional int32 page_size = 4;
+  optional string page_token = 5;
+}
+
+message ListExecutionsResponse {
+  repeated Execution executions = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+message CancelExecutionRequest {
+  string execution_id = 1;
+  string reason = 2;
+}
+
+message RetryExecutionRequest {
+  string execution_id = 1;
+  optional string from_task_id = 2;
+}
+
+// Template Management Messages
+message CreateTemplateRequest {
+  string name = 1;
+  string description = 2;
+  string category = 3;
+  WorkflowDefinition definition = 4;
+  map<string, string> metadata = 5;
+}
+
+message ListTemplatesRequest {
+  optional string category = 1;
+  optional int32 page_size = 2;
+  optional string page_token = 3;
+}
+
+message ListTemplatesResponse {
+  repeated WorkflowTemplate templates = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+message InstantiateTemplateRequest {
+  string template_id = 1;
+  string name = 2;
+  string tenant_id = 3;
+  map<string, string> parameter_overrides = 4;
+}
+
+// Monitoring Messages
+message GetWorkflowMetricsRequest {
+  string workflow_id = 1;
+  int64 start_time = 2;
+  int64 end_time = 3;
+}
+
+message WorkflowMetrics {
+  int32 total_executions = 1;
+  int32 successful_executions = 2;
+  int32 failed_executions = 3;
+  int32 cancelled_executions = 4;
+  double average_duration_seconds = 5;
+  map<string, int32> error_counts = 6;
+}
+
+message StreamExecutionLogsRequest {
+  string execution_id = 1;
+  optional string task_id = 2;
+  optional LogLevel min_level = 3;
+}
+
+message ExecutionLog {
+  string execution_id = 1;
+  string task_id = 2;
+  LogLevel level = 3;
+  string message = 4;
+  int64 timestamp = 5;
+  map<string, string> metadata = 6;
+}
+
+// Core Data Models
+message Workflow {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string tenant_id = 4;
+  WorkflowDefinition definition = 5;
+  WorkflowStatus status = 6;
+  int32 version = 7;
+  map<string, string> metadata = 8;
+  int64 created_at = 9;
+  int64 updated_at = 10;
+  string created_by = 11;
+  string updated_by = 12;
+}
+
+message WorkflowDefinition {
+  repeated Step steps = 1;
+  repeated Trigger triggers = 2;
+  optional ErrorHandler error_handler = 3;
+  map<string, string> global_parameters = 4;
+}
+
+message Step {
+  string id = 1;
+  string name = 2;
+  StepType type = 3;
+  oneof config {
+    ServiceStepConfig service = 4;
+    ParallelStepConfig parallel = 5;
+    ConditionalStepConfig conditional = 6;
+    LoopStepConfig loop = 7;
+    WaitStepConfig wait = 8;
+    HumanTaskStepConfig human_task = 9;
+  }
+  optional RetryPolicy retry = 10;
+  map<string, string> input = 11;
+  repeated string depends_on = 12;
+}
+
+message ServiceStepConfig {
+  string service = 1;
+  string method = 2;
+  int32 timeout_seconds = 3;
+}
+
+message ParallelStepConfig {
+  repeated Step steps = 1;
+  optional int32 max_concurrency = 2;
+}
+
+message ConditionalStepConfig {
+  string condition = 1;
+  repeated Step if_steps = 2;
+  repeated Step else_steps = 3;
+}
+
+message LoopStepConfig {
+  string items_expression = 1;
+  string item_variable = 2;
+  repeated Step steps = 3;
+  optional int32 max_iterations = 4;
+}
+
+message WaitStepConfig {
+  oneof wait_type {
+    int32 duration_seconds = 1;
+    string until_expression = 2;
+  }
+}
+
+message HumanTaskStepConfig {
+  string assignee_expression = 1;
+  string form_schema = 2;
+  int32 timeout_hours = 3;
+}
+
+message Trigger {
+  string id = 1;
+  TriggerType type = 2;
+  oneof config {
+    WebhookTriggerConfig webhook = 3;
+    ScheduleTriggerConfig schedule = 4;
+    EventTriggerConfig event = 5;
+  }
+}
+
+message WebhookTriggerConfig {
+  string path = 1;
+  repeated string allowed_methods = 2;
+  map<string, string> headers = 3;
+}
+
+message ScheduleTriggerConfig {
+  string cron_expression = 1;
+  string timezone = 2;
+}
+
+message EventTriggerConfig {
+  string event_type = 1;
+  map<string, string> filters = 2;
+}
+
+message ErrorHandler {
+  ErrorHandlerType type = 1;
+  optional string notification_channel = 2;
+  repeated CompensationStep compensation_steps = 3;
+}
+
+message CompensationStep {
+  string step_id = 1;
+  string compensation_service = 2;
+  string compensation_method = 3;
+}
+
+message RetryPolicy {
+  int32 attempts = 1;
+  BackoffStrategy backoff = 2;
+  int32 initial_delay_seconds = 3;
+  int32 max_delay_seconds = 4;
+}
+
+message Execution {
+  string id = 1;
+  string workflow_id = 2;
+  string tenant_id = 3;
+  ExecutionStatus status = 4;
+  map<string, string> input_parameters = 5;
+  map<string, string> output_data = 6;
+  optional string error_message = 7;
+  int64 started_at = 8;
+  optional int64 completed_at = 9;
+  string triggered_by = 10;
+  map<string, string> metadata = 11;
+  repeated TaskExecution tasks = 12;
+}
+
+message TaskExecution {
+  string id = 1;
+  string step_id = 2;
+  string name = 3;
+  TaskStatus status = 4;
+  map<string, string> input_data = 5;
+  map<string, string> output_data = 6;
+  optional string error_message = 7;
+  int32 retry_count = 8;
+  int64 started_at = 9;
+  optional int64 completed_at = 10;
+}
+
+message WorkflowTemplate {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string category = 4;
+  WorkflowDefinition definition = 5;
+  map<string, ParameterSchema> parameter_schemas = 6;
+  repeated string tags = 7;
+  int64 created_at = 8;
+  int64 updated_at = 9;
+}
+
+message ParameterSchema {
+  string name = 1;
+  ParameterType type = 2;
+  optional string default_value = 3;
+  bool required = 4;
+  string description = 5;
+  repeated string allowed_values = 6;
+}
+
+// Enums
+enum WorkflowStatus {
+  WORKFLOW_STATUS_UNSPECIFIED = 0;
+  WORKFLOW_STATUS_DRAFT = 1;
+  WORKFLOW_STATUS_ACTIVE = 2;
+  WORKFLOW_STATUS_INACTIVE = 3;
+  WORKFLOW_STATUS_ARCHIVED = 4;
+}
+
+enum ExecutionStatus {
+  EXECUTION_STATUS_UNSPECIFIED = 0;
+  EXECUTION_STATUS_PENDING = 1;
+  EXECUTION_STATUS_RUNNING = 2;
+  EXECUTION_STATUS_COMPLETED = 3;
+  EXECUTION_STATUS_FAILED = 4;
+  EXECUTION_STATUS_CANCELLED = 5;
+  EXECUTION_STATUS_TIMED_OUT = 6;
+}
+
+enum TaskStatus {
+  TASK_STATUS_UNSPECIFIED = 0;
+  TASK_STATUS_PENDING = 1;
+  TASK_STATUS_RUNNING = 2;
+  TASK_STATUS_COMPLETED = 3;
+  TASK_STATUS_FAILED = 4;
+  TASK_STATUS_SKIPPED = 5;
+  TASK_STATUS_CANCELLED = 6;
+}
+
+enum StepType {
+  STEP_TYPE_UNSPECIFIED = 0;
+  STEP_TYPE_SERVICE = 1;
+  STEP_TYPE_PARALLEL = 2;
+  STEP_TYPE_CONDITIONAL = 3;
+  STEP_TYPE_LOOP = 4;
+  STEP_TYPE_WAIT = 5;
+  STEP_TYPE_HUMAN_TASK = 6;
+}
+
+enum TriggerType {
+  TRIGGER_TYPE_UNSPECIFIED = 0;
+  TRIGGER_TYPE_WEBHOOK = 1;
+  TRIGGER_TYPE_SCHEDULE = 2;
+  TRIGGER_TYPE_EVENT = 3;
+}
+
+enum ErrorHandlerType {
+  ERROR_HANDLER_TYPE_UNSPECIFIED = 0;
+  ERROR_HANDLER_TYPE_COMPENSATE = 1;
+  ERROR_HANDLER_TYPE_RETRY = 2;
+  ERROR_HANDLER_TYPE_IGNORE = 3;
+  ERROR_HANDLER_TYPE_FAIL = 4;
+}
+
+enum BackoffStrategy {
+  BACKOFF_STRATEGY_UNSPECIFIED = 0;
+  BACKOFF_STRATEGY_LINEAR = 1;
+  BACKOFF_STRATEGY_EXPONENTIAL = 2;
+  BACKOFF_STRATEGY_FIXED = 3;
+}
+
+enum LogLevel {
+  LOG_LEVEL_UNSPECIFIED = 0;
+  LOG_LEVEL_DEBUG = 1;
+  LOG_LEVEL_INFO = 2;
+  LOG_LEVEL_WARN = 3;
+  LOG_LEVEL_ERROR = 4;
+}
+
+enum ParameterType {
+  PARAMETER_TYPE_UNSPECIFIED = 0;
+  PARAMETER_TYPE_STRING = 1;
+  PARAMETER_TYPE_NUMBER = 2;
+  PARAMETER_TYPE_BOOLEAN = 3;
+  PARAMETER_TYPE_OBJECT = 4;
+  PARAMETER_TYPE_ARRAY = 5;
+}
