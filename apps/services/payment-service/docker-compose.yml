@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  payment-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: payment_service
+    ports:
+      - '5433:5432'
+    volumes:
+      - payment_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  payment-redis:
+    image: redis:7-alpine
+    ports:
+      - '6380:6379'
+    command: redis-server --appendonly yes
+    volumes:
+      - payment_redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  payment-service:
+    build:
+      context: ../../..
+      dockerfile: apps/services/payment-service/Dockerfile
+    ports:
+      - '50052:50052'
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@payment-db:5432/payment_service
+      REDIS_HOST: payment-redis
+      REDIS_PORT: 6379
+      NODE_ENV: development
+      LOG_LEVEL: debug
+    depends_on:
+      payment-db:
+        condition: service_healthy
+      payment-redis:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/apps/services/payment-service/src
+      - ./prisma:/app/apps/services/payment-service/prisma
+      - ../../../libs:/app/libs
+
+volumes:
+  payment_db_data:
+  payment_redis_data:
