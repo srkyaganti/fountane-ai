@@ -1,0 +1,179 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id              String    @id @default(uuid())
+  externalId      String    @unique @map("external_id")
+  email           String    @unique
+  name            String
+  currency        String    @default("USD")
+  billingAddress  Json?     @map("billing_address")
+  metadata        Json?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  subscriptions   Subscription[]
+  paymentMethods  PaymentMethod[]
+  invoices        Invoice[]
+  
+  @@index([email])
+  @@index([externalId])
+  @@map("customers")
+}
+
+model Subscription {
+  id              String    @id @default(uuid())
+  customerId      String    @map("customer_id")
+  status          SubscriptionStatus @default(ACTIVE)
+  planId          String    @map("plan_id")
+  startDate       DateTime  @map("start_date")
+  endDate         DateTime? @map("end_date")
+  canceledAt      DateTime? @map("canceled_at")
+  metadata        Json?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  customer        Customer  @relation(fields: [customerId], references: [id])
+  items           SubscriptionItem[]
+  usageRecords    UsageRecord[]
+  invoices        Invoice[]
+  
+  @@index([customerId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+model SubscriptionItem {
+  id              String    @id @default(uuid())
+  subscriptionId  String    @map("subscription_id")
+  priceId         String    @map("price_id")
+  quantity        Int       @default(1)
+  properties      Json?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  subscription    Subscription @relation(fields: [subscriptionId], references: [id])
+  
+  @@index([subscriptionId])
+  @@map("subscription_items")
+}
+
+model Invoice {
+  id              String    @id @default(uuid())
+  customerId      String    @map("customer_id")
+  subscriptionId  String?   @map("subscription_id")
+  number          String    @unique
+  status          InvoiceStatus @default(DRAFT)
+  amountDue       Float     @map("amount_due")
+  amountPaid      Float     @default(0) @map("amount_paid")
+  currency        String
+  issueDate       DateTime  @map("issue_date")
+  dueDate         DateTime  @map("due_date")
+  paidAt          DateTime? @map("paid_at")
+  metadata        Json?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  customer        Customer  @relation(fields: [customerId], references: [id])
+  subscription    Subscription? @relation(fields: [subscriptionId], references: [id])
+  items           InvoiceItem[]
+  
+  @@index([customerId])
+  @@index([subscriptionId])
+  @@index([status])
+  @@index([number])
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id              String    @id @default(uuid())
+  invoiceId       String    @map("invoice_id")
+  description     String
+  quantity        Float
+  unitPrice       Float     @map("unit_price")
+  amount          Float
+  currency        String
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  invoice         Invoice   @relation(fields: [invoiceId], references: [id])
+  
+  @@index([invoiceId])
+  @@map("invoice_items")
+}
+
+model PaymentMethod {
+  id              String    @id @default(uuid())
+  customerId      String    @map("customer_id")
+  type            PaymentMethodType
+  details         Json
+  isDefault       Boolean   @default(false) @map("is_default")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  customer        Customer  @relation(fields: [customerId], references: [id])
+  
+  @@index([customerId])
+  @@map("payment_methods")
+}
+
+model UsageRecord {
+  id              String    @id @default(uuid())
+  subscriptionId  String    @map("subscription_id")
+  metricCode      String    @map("metric_code")
+  quantity        Float
+  timestamp       DateTime
+  properties      Json?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  subscription    Subscription @relation(fields: [subscriptionId], references: [id])
+  
+  @@index([subscriptionId])
+  @@index([metricCode])
+  @@index([timestamp])
+  @@map("usage_records")
+}
+
+model WebhookEvent {
+  id              String    @id @default(uuid())
+  provider        String
+  eventType       String    @map("event_type")
+  payload         Json
+  headers         Json?
+  processedAt     DateTime? @map("processed_at")
+  error           String?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  @@index([provider])
+  @@index([eventType])
+  @@index([processedAt])
+  @@map("webhook_events")
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  PAUSED
+  TRIALING
+}
+
+enum InvoiceStatus {
+  DRAFT
+  OPEN
+  PAID
+  VOIDED
+  UNCOLLECTABLE
+}
+
+enum PaymentMethodType {
+  CREDIT_CARD
+  DEBIT_CARD
+  BANK_ACCOUNT
+  DIGITAL_WALLET
+}

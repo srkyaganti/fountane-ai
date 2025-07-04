@@ -136,6 +136,8 @@ importers:
 
   apps/services/auth-service-e2e: {}
 
+  apps/services/payment-service: {}
+
   libs/core/config:
     dependencies:
       dotenv:
@@ -194,10 +196,6 @@ importers:
       supertest:
         specifier: ^7.1.1
         version: 7.1.1
-
-  libs/core/testing/services/auth-service: {}
-
-  libs/core/testing/services/auth-service-e2e: {}
 
   libs/core/types:
     dependencies:
