@@ -192,9 +192,9 @@ pnpm nx build gateway-service
 
 This project includes comprehensive documentation:
 
-- **[Fountane AI The Enterprise Intelligence Platform.md](./docs/fountane-ai-platform-overview.md)** - Executive vision and architecture rationale
-- **[Fountane AI - Complete Technical Implementation.md](./docs/fountane-ai-technical-implementation.md)** - Complete technical specification
-- **[Fountane AI - Implementation Plan & Progress Tracker.md](./docs/fountane-ai-implementation-plan.md)** - Detailed roadmap and progress tracking
+- **[Fountane AI The Enterprise Intelligence Platform](./Fountane%20AI%20The%20Enterprise%20Intelligence%20Platform.md)** - Executive vision and architecture rationale
+- **[Fountane AI - Complete Technical Implementation](./Fountane%20AI%20-%20Complete%20Technical%20Implementation.md)** - Complete technical specification
+- **[Fountane AI - Implementation Plan & Progress Tracker](./Fountane%20AI%20-%20Implementation%20Plan%20%26%20Progress%20Tracker.md)** - Detailed roadmap and progress tracking
 
 Each service also includes detailed README documentation in its directory.
 
